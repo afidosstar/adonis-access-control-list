@@ -12,10 +12,10 @@
 // import AclCreateAllAccessPermission from "./AclCreateAllAccessPermission";
 // import AclSetup from "./AclSetup";
 // import AclStoreAccess from "./AclStoreAccess";
-import Application from "@ioc:Adonis/Core/Application";
+// import Application from "@ioc:Adonis/Core/Application";
 import { listDirectoryFiles } from "@adonisjs/ace";
 
 //export default [AclCreateAllAccessPermission, AclSetup, AclStoreAccess];
-export default listDirectoryFiles(__dirname, Application.appRoot, [
+export default listDirectoryFiles(__dirname, process.cwd(), [
   "./commands/index",
 ]);
