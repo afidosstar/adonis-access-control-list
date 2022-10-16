@@ -9,11 +9,14 @@
  *
  */
 
+import { Exception } from "@poppinss/utils";
 
-import {Exception} from "@poppinss/utils";
-
-export default class AccessDeniedException extends Exception{
-    public static invoke(message: string, status: number = 403, code: string = 'E_ACCESS_DENIED') {
-        return new this(message, status, code);
-    }
+export default class AccessDeniedException extends Exception {
+  public static invoke(
+    message: string,
+    status: number = 403,
+    code: string = "E_ACCESS_DENIED"
+  ) {
+    return new this(message, status, code);
+  }
 }

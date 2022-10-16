@@ -37,13 +37,14 @@ export default class AclSetup extends BaseCommand {
 
     const tasksManager = this.ui.tasks();
     tasksManager.add("Make migration", async (_logger, task) => {
-      this.addMigration("accesses")
-        .addMigration("roles")
-        .addMigration("permissions")
-        .addMigration("permissions_accesses")
-        .addMigration("permissions_roles")
-        .addMigration("permissions_users")
-        .addMigration("users_roles");
+      const index = Date.now();
+      this.addMigration("accesses", index)
+        .addMigration("roles", index + 1)
+        .addMigration("permissions", index + 2)
+        .addMigration("permissions_accesses", index + 3)
+        .addMigration("permissions_roles", index + 4)
+        .addMigration("permissions_users", index + 5)
+        .addMigration("users_roles", index + 6);
       await this.generator.run();
       await task.complete();
     });
@@ -56,9 +57,9 @@ export default class AclSetup extends BaseCommand {
     return data.some((val) => /accesses/.test(val));
   }
 
-  private addMigration(name: string): this {
+  private addMigration(name: string, index: number): this {
     this.generator
-      .addFile(`${Date.now()}_${name}`, {
+      .addFile(`${index}_${name}`, {
         pattern: "snakecase",
       })
       .appRoot(this.application.appRoot)

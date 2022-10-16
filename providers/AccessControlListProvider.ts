@@ -24,7 +24,7 @@ import {
 import { join } from "path";
 import BaseUser from "../src/Models/BaseUser";
 import Role from "../src/Models/Role";
-import {LucidModel} from "@ioc:Adonis/Lucid/Orm";
+import { LucidModel } from "@ioc:Adonis/Lucid/Orm";
 import Access from "../src/Models/Access";
 import Permission from "../src/Models/Permission";
 import AuthorizeMiddleware from "../middleware/AuthorizeMiddleware";
@@ -34,7 +34,7 @@ export default class AccessControlProvider {
 
   constructor(protected app: ApplicationContract) {}
 
-  private registerModel(){
+  private registerModel() {
     this.app.container.bind("Adonis/Addons/Acl/BaseUser", () => {
       return BaseUser;
     });
@@ -49,9 +49,9 @@ export default class AccessControlProvider {
     });
   }
 
-  private registerMiddleware(){
-    this.app.container.singleton('Adonis/Addons/Acl/Authorize', () => {
-        return AuthorizeMiddleware;
+  private registerMiddleware() {
+    this.app.container.singleton("Adonis/Addons/Acl/Authorize", () => {
+      return AuthorizeMiddleware;
     });
   }
 
@@ -59,7 +59,6 @@ export default class AccessControlProvider {
     this.registerModel();
     this.registerMiddleware();
   }
-
 
   public boot() {
     const Route = this.app.container.use("Adonis/Core/Route");
@@ -191,8 +190,8 @@ export default class AccessControlProvider {
     }
   }
 
-  private bootModel(model: LucidModel):LucidModel{
-    if(!model.booted) {
+  private bootModel(model: LucidModel): LucidModel {
+    if (!model.booted) {
       model.boot();
     }
     return model;

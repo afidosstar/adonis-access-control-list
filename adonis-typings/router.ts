@@ -10,7 +10,7 @@
  */
 
 declare module "@ioc:Adonis/Core/Route" {
-  import { AccessRouteContract } from "@ioc:Adonis/Addons/Adonis-acl";
+  import { AccessRouteContract } from "@ioc:Adonis/Addons/AdonisAccessControlList";
   export interface RouterContract {
     authorizeRoute: AccessRouteContract;
   }
