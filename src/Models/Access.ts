@@ -8,7 +8,6 @@
  *  file that was distributed with this source code.
  *
  */
-
 import { DateTime } from "luxon";
 import { BaseModel, column } from "@ioc:Adonis/Lucid/Orm";
 

@@ -99,7 +99,7 @@
     ],
     "templates": {
       "config": [
-        "config/acl.txt"
+        "acl.txt"
       ]
     }
   }

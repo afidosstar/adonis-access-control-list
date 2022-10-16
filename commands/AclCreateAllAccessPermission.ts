@@ -1,6 +1,6 @@
 import { BaseCommand, flags } from "@adonisjs/core/build/standalone";
-import Access from "../src/Models/Access";
-import Permission from "../src/Models/Permission";
+//import Access from "../src/Models/Access";
+//import Permission from "../src/Models/Permission";
 import { snakeCase } from "snake-case";
 
 export default class AclCreateAllAccessPermission extends BaseCommand {
@@ -39,6 +39,8 @@ export default class AclCreateAllAccessPermission extends BaseCommand {
   public description: string = "Create/update permission and assign all access";
 
   public async run() {
+    const Access = require("../src/Models/Access").default;
+    const Permission = require("../src/Models/Permission").default;
     const permission = await Permission.updateOrCreate(
       { name: "all" },
       {
