@@ -22,11 +22,7 @@ import {
   ConfigAclContract,
 } from "@ioc:Adonis/Addons/AdonisAccessControlList";
 import { join } from "path";
-import BaseUser from "../src/Models/BaseUser";
-import Role from "../src/Models/Role";
 import { LucidModel } from "@ioc:Adonis/Lucid/Orm";
-import Access from "../src/Models/Access";
-import Permission from "../src/Models/Permission";
 import AuthorizeMiddleware from "../middleware/AuthorizeMiddleware";
 
 export default class AccessControlProvider {
@@ -36,16 +32,16 @@ export default class AccessControlProvider {
 
   private registerModel() {
     this.app.container.bind("Adonis/Addons/Acl/BaseUser", () => {
-      return BaseUser;
+      return require("../src/Models/BaseUser").default;
     });
     this.app.container.bind("Adonis/Addons/Acl/Role", () => {
-      return this.bootModel(Role);
+      return this.bootModel(require("../src/Models/Role").default);
     });
     this.app.container.bind("Adonis/Addons/Acl/Access", () => {
-      return this.bootModel(Access);
+      return this.bootModel(require("../src/Models/Access").default);
     });
     this.app.container.bind("Adonis/Addons/Acl/Permission", () => {
-      return this.bootModel(Permission);
+      return this.bootModel(require("../src/Models/Permission").default);
     });
   }
 
