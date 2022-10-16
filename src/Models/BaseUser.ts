@@ -11,11 +11,10 @@
 
 import { LucidModel, ManyToMany, manyToMany } from "@ioc:Adonis/Lucid/Orm";
 import { NormalizeConstructor } from "@poppinss/utils/build/src/Helpers";
-import { authUser } from "../Decorator/AuthUser";
 import Role from "./Role";
 import Permission from "./Permission";
 import Config from "@ioc:Adonis/Core/Config";
-import { getUserAccessSlug } from "../utils";
+import {checkAccess, getUserAccessSlug} from "../utils";
 const { permissionUser, userRole } = Config.get("acl.joinTables");
 
 /**
@@ -42,17 +41,16 @@ export default function BaseUser<T extends NormalizeConstructor<LucidModel>>(
     })
     public permissions: ManyToMany<typeof Permission>;
 
-    @authUser({ serializeAs: null })
-    public createdBy: number;
-
-    @authUser({ isUpdated: true, serializeAs: null })
-    public updatedBy: number;
 
     public getAllAccess(): Promise<string[]> {
       return getUserAccessSlug(
         this.$attributes[this.$primaryKeyValue || "id"],
         this.$trx
       );
+    }
+
+    public async can(slug: string): Promise<boolean> {
+      return checkAccess(this.$attributes[this.$primaryKeyValue || "id"], slug, this.$trx);
     }
   }
   return Mixin;

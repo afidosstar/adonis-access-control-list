@@ -1,5 +1,5 @@
 # adonis-access-control-list
-> Add helper on Secure application for Adonis JS 5+
+> Add Access Control List (acl) for Adonis JS 5+
 
 [![typescript-image]][typescript-url] 
 [![npm-image]][npm-url] 
@@ -20,64 +20,122 @@
 # Installation
 Run:
 ```bash
-npm i --save @fickou/adonis-controller-helpers
+npm i --save @fickou/adonis-access-control-list
 ```
 
 Install provider:
 ```bash
-node ace configure @fickou/adonis-controller-helpers
+node ace configure @fickou/adonis-access-control-list
 ```
-
-# Sample Usage
-## Controller
-In a controller
+# Configuration
+## config
+Go to `config/acl.ts` and defined you own configuration:
 
 ```ts
-import {HttpContextContract} from "@ioc:Adonis/Core/HttpContext";
-import IndexService from 'App/Services/users/Index'
-import Database from "@ioc:Adonis/Lucid/Database";
+import { ConfigAclContract } from "@ioc:Adonis/Addons/AdonisAccessControlList";
 
-export default UserController{
-public index({ request, response }: HttpContextContract){
-        let data = await request.checkInputs();
-        await Database.transaction(async (trx) => {
-            const executor = new Index(trx);
-            return response.apiView(await executor.execute(data));
-        });
-    }
+const configAcl: ConfigAclContract = {
+    prefix: "acl",
+    middlewares: "auth:api",
+    joinTables: {
+        permissionAccess: "permission_access",
+        permissionRole: "permission_role",
+        permissionUser: "permission_user",
+        userRole: "user_role",
+    },
+    /**
+     * `apiOnly` is used for auto configure view for assign access to permission
+     * by default it's false, if you want to use it, you need to set it to true
+     */
+    apiOnly: false,
+};
+
+export default configAcl
+```
+
+## Aliases
+Go to `.adonisrc.json` and add aliases:
+
+```ts
+{
+    "aliases": {
+    "BaseUser": "Adonis/Addons/Acl/BaseUser",
+    "Role": "Adonis/Addons/Acl/Role",
+    "Access": "Adonis/Addons/Acl/Access",
+    "Permission": "Adonis/Addons/Acl/Permission",
+  
+  }
 }
 ```
 
-## Service
+## Registering middleware
 
-In a service:
+Register the following middleware inside `start/kernel.ts` file.
 
 ```ts
-import Parameter from 'App/Models/settings/Parameter';
-import ControllerHelper, from "@ioc:Adonis/Addons/ControllerHelper";
-import {Service} from "@fickou/adonis-controller-helpers";
+Server.middleware.register([
+    ...,
+    'Adonis/Addons/Acl/Authorize',
+])
+```
 
-export default class Index extends Service {
+## Models
+Go to `App/Models/User.ts`, Compose user model with `BaseUser`:
 
+```ts
+import {BaseModel, column} from '@ioc:Adonis/Lucid/Orm'
+import {compose} from "@poppinss/utils/build/src/Helpers";
+import BaseUser from "@ioc:BaseUser";
+import {authUser} from "@fickou/adonis-access-control-list";
 
-    async execute(payload) {
-        const query = Parameter.query({client: this.trx});
-        return ControllerHelper.searchPayload(query, payload);
-    }
+export default class User extends compose(BaseModel, BaseUser) {
+    @column({isPrimary: true})
+    public id: number
+
+    @column()
+    public name: string
+
+    @column()
+    public email: string
+
+    @column()
+    public password: string
+
+    // @authUser()
+    // created_by: number;
+    
+    // @authUser({isUpdate: true})
+    // updated_by: number;
 }
-
-// or 
-
-export default class Index extends Service {
+```
 
 
-    async execute(payload) {
-        const query = ControllerHelper.buildQuery((this.trx || Database), (db) => db.query()
-            .from('parameters')
-            .select(['*']);
-        return ControllerHelper.searchDatabasePayload(query, payload);
-    }
-}
+
+# Protect Routes
+ Protect routes with middleware
+## Routes
+
+```ts
+import {Route} from "@adonisjs/http-server/build/src/Router/Route";
+
+Route.group(() => {
+    Route.get('users', 'UsersController.index')
+        .access('list_user', 'List users');
+    Route.get('users/:id', 'UsersController.show')
+        .access('show_user', 'Show detail user');
+    Route.post('users', 'UsersController.store')
+        .access('show_user', 'Show detail user');
+    Route.put('users/:id', 'UsersController.update')
+        .access('update_user', 'Update user');
+    Route.delete('users/:id', 'UsersController.destroy')
+        .access('destroy_user', 'Destroy user');
+    
+    //or
+    
+    Route.ressource('users', 'UsersController')
+        .access('user', 'User')
+        
+}).prefix('api/v1');
 ```
 
 
@@ -85,10 +143,10 @@ export default class Index extends Service {
 [typescript-image]: https://img.shields.io/badge/Typescript-294E80.svg?logo=typescript
 [typescript-url]:  "typescript"
 
-[npm-image]: https://img.shields.io/npm/v/%40fickou%2Fadonis-controller-helpers.svg?logo=npm
+[npm-image]: https://img.shields.io/npm/v/%40fickou%2Fadonis-access-control-list.svg?logo=npm
 [npm-url]: https://www.npmjs.com/package/adonis-request-throttler "npm"
 
-[license-image]: https://img.shields.io/npm/l/%40fickou%2Fadonis-controller-helpers?color=blueviolet
+[license-image]: https://img.shields.io/npm/l/%40fickou%2Fadonis-access-control-list?color=blueviolet
 [license-url]: LICENSE.md "license"
 [my-coffee-image]:https://img.shields.io/badge/-buy_me_a%C2%A0coffee-gray?logo=buy-me-a-coffee
 [my-coffee-url]:https://www.buymeacoffee.com/afidosstar

@@ -10,16 +10,16 @@
  */
 
 import {
+  DatabaseQueryBuilderContract,
   QueryClientContract,
   TransactionClientContract,
 } from "@ioc:Adonis/Lucid/Database";
 import { Database } from "@adonisjs/lucid/build/src/Database";
 import Config from "@ioc:Adonis/Core/Config";
 
-export async function getUserAccessSlug(
-  userId: number,
+function builQuery(
   trx?: TransactionClientContract
-): Promise<Array<string>> {
+): DatabaseQueryBuilderContract<any> {
   const { permissionAccess, permissionRole, permissionUser, userRole } =
     Config.get("acl.joinTables");
   return ((trx || Database) as QueryClientContract | TransactionClientContract)
@@ -49,7 +49,35 @@ export async function getUserAccessSlug(
       "permissions.id"
     )
     .leftJoin("roles", `${permissionRole}.roles_id`, "roles.id")
-    .leftJoin(`${userRole}`, `${userRole}.roles_id`, "roles.id")
+    .leftJoin(`${userRole}`, `${userRole}.roles_id`, "roles.id");
+}
+
+export async function getUserAccessSlug(
+  userId: number,
+  trx?: TransactionClientContract
+): Promise<Array<string>> {
+  const { permissionUser, userRole } = Config.get("acl.joinTables");
+  return builQuery(trx)
     .where(`${permissionUser}.user_id`, userId)
     .orWhere(`${userRole}.user_id`, userId);
+}
+
+export function checkAccess(
+  userId: number,
+  slug: string,
+  trx?: TransactionClientContract
+): Promise<boolean> {
+  const { permissionUser, userRole } = Config.get("acl.joinTables");
+  return builQuery(trx)
+    .where((qb) =>
+      qb
+        .where(`${permissionUser}.user_id`, userId)
+        .orWhere(`${userRole}.user_id`, userId)
+    )
+    .where("accesses.slug", slug)
+    .then((res) => res.length > 0);
+}
+
+export async function checkAccesses(accesses: string[], slugs: string[]) {
+  return slugs.every((slug) => accesses.includes(slug));
 }

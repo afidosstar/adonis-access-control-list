@@ -34,14 +34,4 @@ declare module "@ioc:Adonis/Addons/AdonisAccessControlList" {
     apiOnly: boolean;
   }
   export type AclAuthDecorator = (target: any, property: any) => void;
-
-  interface BaseUserContract<P extends LucidModel, R extends LucidModel> {
-    [key: string]: any;
-    permissions: ManyToMany<P>;
-    roles: ManyToMany<R>;
-  }
-
-  export type AuthFnAccess = () => Promise<string[]>;
-  export type AuthFnCheckAccess = (expr: string) => Promise<boolean>;
-  export type AuthFnCheckProfile = (expr: string) => boolean;
 }

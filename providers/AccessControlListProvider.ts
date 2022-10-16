@@ -22,13 +22,44 @@ import {
   ConfigAclContract,
 } from "@ioc:Adonis/Addons/AdonisAccessControlList";
 import { join } from "path";
+import BaseUser from "../src/Models/BaseUser";
+import Role from "../src/Models/Role";
+import {LucidModel} from "@ioc:Adonis/Lucid/Orm";
+import Access from "../src/Models/Access";
+import Permission from "../src/Models/Permission";
+import AuthorizeMiddleware from "../middleware/AuthorizeMiddleware";
 
 export default class AccessControlProvider {
   public needApplication: boolean = true;
 
   constructor(protected app: ApplicationContract) {}
 
-  public register() {}
+  private registerModel(){
+    this.app.container.bind("Adonis/Addons/Acl/BaseUser", () => {
+      return BaseUser;
+    });
+    this.app.container.bind("Adonis/Addons/Acl/Role", () => {
+      return this.bootModel(Role);
+    });
+    this.app.container.bind("Adonis/Addons/Acl/Access", () => {
+      return this.bootModel(Access);
+    });
+    this.app.container.bind("Adonis/Addons/Acl/Permission", () => {
+      return this.bootModel(Permission);
+    });
+  }
+
+  private registerMiddleware(){
+    this.app.container.singleton('Adonis/Addons/Acl/Authorize', () => {
+        return AuthorizeMiddleware;
+    });
+  }
+
+  public register() {
+    this.registerModel();
+    this.registerMiddleware();
+  }
+
 
   public boot() {
     const Route = this.app.container.use("Adonis/Core/Route");
@@ -158,5 +189,12 @@ export default class AccessControlProvider {
     if (configACL.prefix) {
       service.prefix(configACL.prefix);
     }
+  }
+
+  private bootModel(model: LucidModel):LucidModel{
+    if(!model.booted) {
+      model.boot();
+    }
+    return model;
   }
 }
