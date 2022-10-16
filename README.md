@@ -287,7 +287,7 @@ const accesses = await user.getAccesses()
 ## Routes
 
 ```ts
-import {Route} from "@adonisjs/http-server/build/src/Router/Route";
+import Route from '@ioc:Adonis/Core/Route';
 
 Route.group(() => {
     Route.get('users', 'UsersController.index')
