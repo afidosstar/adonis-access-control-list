@@ -27,6 +27,13 @@ Install provider:
 ```bash
 node ace configure @fickou/adonis-access-control-list
 ```
+Publish the package migrations to your application.
+
+```bash
+$ node ace acl:setup
+```
+Apply all migration with `node ace migrations:run`
+
 # Configuration
 ## config
 Go to `config/acl.ts` and defined you own configuration:
@@ -107,12 +114,6 @@ export default class User extends compose(BaseModel, BaseUser) {
     // @authUser({isUpdate: true})
     // updated_by: number;
 }
-```
-
-6. Publish the package migrations to your application and run these with `./ace migrations:run`.
-
-```bash
-$ node ace acl:setup
 ```
 
 ## Working With Roles
