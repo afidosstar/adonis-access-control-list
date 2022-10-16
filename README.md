@@ -109,6 +109,177 @@ export default class User extends compose(BaseModel, BaseUser) {
 }
 ```
 
+6. Publish the package migrations to your application and run these with `./ace migrations:run`.
+
+```bash
+$ node ace acl:setup
+```
+
+## Working With Roles
+
+### Create Role
+
+Lets create your first roles.
+
+```js
+const roleAdmin = new Role()
+roleAdmin.name = 'Administrator'
+roleAdmin.slug = 'administrator'
+roleAdmin.description = 'manage administration privileges'
+await roleAdmin.save()
+
+const roleModerator = new Role()
+roleModerator.name = 'Moderator'
+roleModerator.slug = 'moderator'
+roleModerator.description = 'manage moderator privileges'
+await roleModerator.save()
+```
+
+### Attach Role(s) To User
+```js
+const user = await User.find(1)
+await user.related('roles').attach([roleAdmin.id, roleModerator.id])
+```
+
+### Detach Role(s) From User
+
+```js
+const user = await User.find(1)
+await user.related('roles').detach([roleAdmin.id])
+```
+
+### Get User Roles
+
+Get roles assigned to a user.
+
+```js
+const user = await User.first()
+const roles = await user.getRoles() // ['administrator', 'moderator']
+```
+
+## Working With Permissions
+
+### Create Role Permissions
+
+```js
+const createUsersPermission = new Permission()
+createUsersPermission.slug = 'create_users'
+createUsersPermission.name = 'Create Users'
+createUsersPermission.description = 'create users permission'
+await createUsersPermission.save()
+
+const updateUsersPermission = new Permission()
+updateUsersPermission.slug = 'update_users'
+updateUsersPermission.name = 'Update Users'
+updateUsersPermission.description = 'update users permission'
+await updateUsersPermission.save()
+
+const deleteUsersPermission = new Permission()
+deleteUsersPermission.slug = 'delete_users'
+deleteUsersPermission.name = 'Delete Users'
+deleteUsersPermission.description = 'delete users permission'
+await deleteUsersPermission.save()
+
+const readUsersPermission = new Permission()
+readUsersPermission.slug = 'read_users'
+readUsersPermission.name = 'Read Users'
+readUsersPermission.description = 'read users permission'
+await readUsersPermission.save()
+```
+
+### Attach Permissions to Role
+
+```js
+const roleAdmin = await Role.find(1)
+await roleAdmin.related('permissions').attach([
+  createUsersPermission.id,
+  updateUsersPermission.id,
+  deleteUsersPermission.id,
+  readUsersPermission.id
+])
+```
+
+### Detach Permissions from Role
+
+```js
+const roleAdmin = await Role.find(1)
+await roleAdmin.related('permissions').detach([
+  createUsersPermission.id,
+  updateUsersPermission.id,
+  readUsersPermission.id
+])
+```
+
+### Get User Permissions
+
+Get permissions assigned to a role.
+```js
+const roleAdmin = await Role.find(1)
+// collection of permissions
+await roleAdmin.related('permissions').fetch()
+```
+
+## Working With Permissions
+
+### Create User Permissions
+
+```js
+const createUsersPermission = new Permission()
+createUsersPermission.slug = 'create_users'
+createUsersPermission.name = 'Create Users'
+createUsersPermission.description = 'create users permission'
+await createUsersPermission.save()
+
+const updateUsersPermission = new Permission()
+updateUsersPermission.slug = 'update_users'
+updateUsersPermission.name = 'Update Users'
+updateUsersPermission.description = 'update users permission'
+await updateUsersPermission.save()
+
+const deleteUsersPermission = new Permission()
+deleteUsersPermission.slug = 'delete_users'
+deleteUsersPermission.name = 'Delete Users'
+deleteUsersPermission.description = 'delete users permission'
+await deleteUsersPermission.save()
+
+const readUsersPermission = new Permission()
+readUsersPermission.slug = 'read_users'
+readUsersPermission.name = 'Read Users'
+readUsersPermission.description = 'read users permission'
+await readUsersPermission.save()
+```
+
+### Attach Permissions to User
+
+```js
+const user = await User.find(1)
+await user.related('permissions').attach([
+  createUsersPermission.id,
+  updateUsersPermission.id,
+  readUsersPermission.id
+])
+```
+
+### Detach Permissions from User
+
+```js
+const user = await User.find(1)
+await user.related('permissions').detach([
+  createUsersPermission.id,
+  updateUsersPermission.id,
+  readUsersPermission.id
+])
+```
+
+### Get User Accesses
+
+Get permissions assigned to a role.
+
+```js
+const user = await User.find(1)
+// ['create_users', 'update_users', 'delete_users', 'read_users']
+const accesses = await user.getAccesses()
+```
 
 
 # Protect Routes

@@ -17,7 +17,7 @@ import {
 import { Database } from "@adonisjs/lucid/build/src/Database";
 import Config from "@ioc:Adonis/Core/Config";
 
-function builQuery(
+function buildQuery(
   trx?: TransactionClientContract
 ): DatabaseQueryBuilderContract<any> {
   const { permissionAccess, permissionRole, permissionUser, userRole } =
@@ -25,7 +25,7 @@ function builQuery(
   return ((trx || Database) as QueryClientContract | TransactionClientContract)
     .query()
     .from("accesses")
-    .distinct("slug")
+    .distinct("accesses.slug")
     .leftJoin(permissionAccess, `${permissionAccess}.access_id`, "accesses.id")
     .leftJoin(
       "permissions",
@@ -57,9 +57,11 @@ export async function getUserAccessSlug(
   trx?: TransactionClientContract
 ): Promise<Array<string>> {
   const { permissionUser, userRole } = Config.get("acl.joinTables");
-  return builQuery(trx)
+  return buildQuery(trx)
     .where(`${permissionUser}.user_id`, userId)
-    .orWhere(`${userRole}.user_id`, userId);
+    .orWhere(`${userRole}.user_id`, userId).then((res) => {
+      return res.map((r) => r.slug);
+    });
 }
 
 export function checkAccess(
@@ -68,7 +70,7 @@ export function checkAccess(
   trx?: TransactionClientContract
 ): Promise<boolean> {
   const { permissionUser, userRole } = Config.get("acl.joinTables");
-  return builQuery(trx)
+  return buildQuery(trx)
     .where((qb) =>
       qb
         .where(`${permissionUser}.user_id`, userId)
@@ -78,6 +80,36 @@ export function checkAccess(
     .then((res) => res.length > 0);
 }
 
-export async function checkAccesses(accesses: string[], slugs: string[]) {
-  return slugs.every((slug) => accesses.includes(slug));
+
+
+
+export function getUserRoles(userId: number,trx?: TransactionClientContract){
+  const { userRole } =
+      Config.get("acl.joinTables");
+  return ((trx || Database) as QueryClientContract | TransactionClientContract)
+      .query()
+      .from("roles")
+      .distinct("roles.slug")
+      .leftJoin(userRole, `${userRole}.role_id`, "roles.id")
+      .where(`${userRole}.user_id`, userId).then((res) => {
+        return res.map((r) => r.slug);
+      });
+}
+
+export function getUserPermissions(userId: number,trx?: TransactionClientContract){
+  const { permissionRole, permissionUser, userRole } =
+      Config.get("acl.joinTables");
+  return ((trx || Database) as QueryClientContract | TransactionClientContract)
+      .query()
+      .from("permissions")
+      .distinct("permissions.slug")
+      .leftJoin(permissionUser, `${permissionUser}.permission_id`, "permissions.id")
+      .leftJoin(permissionRole, `${permissionRole}.permission_id`, "permissions.id")
+      .leftJoin('roles', `${permissionRole}.role_id`, "roles.id")
+      .leftJoin(userRole, `${userRole}.role_id`, "roles.id")
+      .where(`${userRole}.user_id`, userId)
+      .where(`${permissionUser}.user_id`, userId)
+      .then((res) => {
+        return res.map((r) => r.slug);
+      });
 }

@@ -14,7 +14,7 @@ import { NormalizeConstructor } from "@poppinss/utils/build/src/Helpers";
 import Role from "./Role";
 import Permission from "./Permission";
 import Config from "@ioc:Adonis/Core/Config";
-import {checkAccess, getUserAccessSlug} from "../utils";
+import {checkAccess, getUserAccessSlug, getUserPermissions, getUserRoles} from "../utils";
 const { permissionUser, userRole } = Config.get("acl.joinTables");
 
 /**
@@ -42,7 +42,7 @@ export default function BaseUser<T extends NormalizeConstructor<LucidModel>>(
     public permissions: ManyToMany<typeof Permission>;
 
 
-    public getAllAccess(): Promise<string[]> {
+    public getAccesses(): Promise<string[]> {
       return getUserAccessSlug(
         this.$attributes[this.$primaryKeyValue || "id"],
         this.$trx
@@ -51,6 +51,13 @@ export default function BaseUser<T extends NormalizeConstructor<LucidModel>>(
 
     public async can(slug: string): Promise<boolean> {
       return checkAccess(this.$attributes[this.$primaryKeyValue || "id"], slug, this.$trx);
+    }
+
+    public async getRoles(): Promise<string[]> {
+      return getUserRoles(this.$attributes[this.$primaryKeyValue || "id"], this.$trx);
+    }
+    public async getPermissions(): Promise<string[]> {
+      return getUserPermissions(this.$attributes[this.$primaryKeyValue || "id"], this.$trx);
     }
   }
   return Mixin;
