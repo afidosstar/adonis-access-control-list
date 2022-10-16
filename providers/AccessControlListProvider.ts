@@ -46,7 +46,7 @@ export default class AccessControlProvider {
 
   private registerMiddleware() {
     this.app.container.singleton("Adonis/Addons/Acl/Authorize", () => {
-      return require('../middleware/AuthorizeMiddleware').default;
+      return require("../middleware/AuthorizeMiddleware").default;
     });
   }
   private registerOther() {
