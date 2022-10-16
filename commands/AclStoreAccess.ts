@@ -1,5 +1,4 @@
 import { BaseCommand } from "@adonisjs/core/build/standalone";
-import Database from "@ioc:Adonis/Lucid/Database";
 import * as _ from "lodash";
 import { AccessRouteContract } from "@ioc:Adonis/Addons/AdonisAccessControlList";
 import { snakeCase } from "snake-case";
@@ -34,6 +33,7 @@ export default class AclStoreAccess extends BaseCommand {
 
   public async run() {
     const Router = this.application.container.use("Adonis/Core/Route");
+    const Database = this.application.container.use("Adonis/Lucid/Database");
 
     /**
      * Commit routes before we can read them
