@@ -60,8 +60,8 @@
     "@adonisjs/view": "^6.2.0"
   },
   "peerDependencies": {
-    "@adonisjs/auth": "^18.2.0",
-    "@adonisjs/core": "^5.8.7",
+    "@adonisjs/auth": "^8.0.10",
+    "@adonisjs/core": "^5.4.2",
     "@adonisjs/http-server": "^5.11.0",
     "@adonisjs/lucid": "^18.2.0",
     "@adonisjs/view": "^6.2.0"
