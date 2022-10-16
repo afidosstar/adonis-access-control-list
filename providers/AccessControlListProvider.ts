@@ -194,7 +194,7 @@ export default class AccessControlProvider {
         "permissions/:id/accesses/sync",
         "PermissionController.sync"
       ).as("acl.permissions.accesses.sync");
-    }).namespace(join(__dirname, "..", "src/Controllers"));
+    }); // .namespace(join(__dirname, "..", "src/Controllers"));
     // Add middleware to route group
     if (configACL.middlewares) {
       service.middleware(configACL.middlewares);
