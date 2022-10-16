@@ -7,8 +7,15 @@
  * file that was distributed with this source code.
  */
 
+
 declare module "@ioc:Adonis/Addons/Auth" {
-  interface GuardsList {
+  export interface GuardsList {
+    jwt: {
+      implementation: any;
+      config: any;
+    };
+  }
+  export interface ProvidersList {
     jwt: {
       implementation: any;
       config: any;

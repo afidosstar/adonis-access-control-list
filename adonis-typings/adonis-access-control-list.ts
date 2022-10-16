@@ -15,7 +15,6 @@ declare module "@ioc:Adonis/Addons/AdonisAccessControlList" {
 
   export interface AuthUserOptions extends ColumnOptions {
     isUpdated: boolean;
-    guard: keyof GuardsList;
   }
   export interface AccessRouteContract {
     name: string;

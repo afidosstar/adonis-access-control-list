@@ -15,23 +15,32 @@ import {
   AclAuthDecorator,
   AuthUserOptions,
 } from "@ioc:Adonis/Addons/AdonisAccessControlList";
-import { GuardsList } from "@ioc:Adonis/Addons/Auth";
+import { GuardContract, ProvidersList } from "@ioc:Adonis/Addons/Auth";
 
 export function authUser(
-  options: Partial<AuthUserOptions> = { isUpdated: false, guard: "jwt" }
+  options: Partial<AuthUserOptions> = { isUpdated: false }
 ): AclAuthDecorator {
   return function (target: any, property: any) {
     const Model = target.constructor as LucidModel;
-    options = Object.assign({ isUpdated: false, guard: "jwt" }, options || {});
+    options = Object.assign({ isUpdated: false }, options || {});
     Model.boot();
     Model.$addColumn(property, options);
     Model.before(
       options.isUpdated ? "update" : "create",
       async function (entity: LucidRow) {
-        const auth = await HttpContext.get()
-          ?.auth.use(options.guard as keyof GuardsList)
-          .authenticate();
-        entity.$attributes[property] = auth?.id;
+        const ctx = HttpContext.get();
+        if (!ctx) {
+          return;
+        }
+        const auth = ctx.auth as GuardContract<keyof ProvidersList, any>;
+        if (!auth) {
+          return;
+        }
+        const user = await auth.authenticate();
+        if (!user) {
+          return;
+        }
+        entity[property] = user.id;
       }
     );
   };
