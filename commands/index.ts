@@ -9,17 +9,14 @@
  *
  */
 
-// import AclCreateAllAccessPermission from "./AclCreateAllAccessPermission";
-// import AclSetup from "./AclSetup";
-// import AclStoreAccess from "./AclStoreAccess";
-// import Application from "@ioc:Adonis/Core/Application";
-// import { listDirectoryFiles } from "@adonisjs/ace";
-import { join } from "path";
+function resolve(path) {
+  return `@fickou/adonis-access-control-list/build/commands/${path}`;
+}
 
 export default [
-  join(__dirname, "AclCreateAllAccessPermission"),
-  join(__dirname, "AclSetup"),
-  join(__dirname, "AclStoreAccess"),
+  resolve("AclCreateAllAccessPermission"),
+  resolve("AclSetup"),
+  resolve("AclStoreAccess"),
 ];
 
 //export default listDirectoryFiles(__dirname, Application, [
