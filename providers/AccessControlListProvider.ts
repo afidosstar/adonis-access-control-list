@@ -54,6 +54,10 @@ export default class AccessControlProvider {
   public register() {
     this.registerModel();
     this.registerMiddleware();
+    this.app.container.bind("Adonis/Addons/Acl/Decorator/AuthUser", () => {
+      const { authUser } = require("../src/Decorator/AuthUser");
+      return authUser;
+    });
   }
 
   public boot() {

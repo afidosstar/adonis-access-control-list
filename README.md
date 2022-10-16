@@ -66,11 +66,9 @@ Go to `.adonisrc.json` and add aliases:
 ```ts
 {
     "aliases": {
-    "BaseUser": "Adonis/Addons/Acl/BaseUser",
     "Role": "Adonis/Addons/Acl/Role",
     "Access": "Adonis/Addons/Acl/Access",
     "Permission": "Adonis/Addons/Acl/Permission",
-  
   }
 }
 ```
@@ -92,8 +90,8 @@ Go to `App/Models/User.ts`, Compose user model with `BaseUser`:
 ```ts
 import {BaseModel, column} from '@ioc:Adonis/Lucid/Orm'
 import {compose} from "@poppinss/utils/build/src/Helpers";
-import BaseUser from "@ioc:BaseUser";
-import {authUser} from "@fickou/adonis-access-control-list";
+import BaseUser from "@ioc:Adonis/Addons/Acl/BaseUser";
+import authUser from "ioc:Adonis/Addons/Acl/Decorator/AuthUser";
 
 export default class User extends compose(BaseModel, BaseUser) {
     @column({isPrimary: true})
