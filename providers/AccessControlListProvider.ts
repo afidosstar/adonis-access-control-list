@@ -63,6 +63,10 @@ export default class AccessControlProvider {
         return PermissionController;
       }
     );
+    this.app.container.alias(
+      "Adonis/Addons/Acl/Controllers/PermissionController",
+      "PermissionController"
+    );
   }
 
   public register() {
