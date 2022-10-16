@@ -23,7 +23,6 @@ import {
 } from "@ioc:Adonis/Addons/AdonisAccessControlList";
 import { join } from "path";
 import { LucidModel } from "@ioc:Adonis/Lucid/Orm";
-import AuthorizeMiddleware from "../middleware/AuthorizeMiddleware";
 
 export default class AccessControlProvider {
   public needApplication: boolean = true;
@@ -47,17 +46,29 @@ export default class AccessControlProvider {
 
   private registerMiddleware() {
     this.app.container.singleton("Adonis/Addons/Acl/Authorize", () => {
-      return AuthorizeMiddleware;
+      return require('../middleware/AuthorizeMiddleware').default;
     });
+  }
+  private registerOther() {
+    this.app.container.singleton("Adonis/Addons/Acl/Decorator/AuthUser", () => {
+      const { authUser } = require("../src/Decorator/AuthUser");
+      return authUser;
+    });
+    this.app.container.singleton(
+      "Adonis/Addons/Acl/Controllers/PermissionController",
+      () => {
+        const {
+          default: PermissionController,
+        } = require("../src/Controllers/PermissionController");
+        return PermissionController;
+      }
+    );
   }
 
   public register() {
     this.registerModel();
     this.registerMiddleware();
-    this.app.container.bind("Adonis/Addons/Acl/Decorator/AuthUser", () => {
-      const { authUser } = require("../src/Decorator/AuthUser");
-      return authUser;
-    });
+    this.registerOther();
   }
 
   public boot() {
