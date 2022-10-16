@@ -63,10 +63,6 @@ export default class AccessControlProvider {
         return PermissionController;
       }
     );
-    this.app.container.alias(
-      "Adonis/Addons/Acl/Controllers/PermissionController",
-      "PermissionController"
-    );
   }
 
   public register() {
@@ -194,7 +190,7 @@ export default class AccessControlProvider {
         "permissions/:id/accesses/sync",
         "PermissionController.sync"
       ).as("acl.permissions.accesses.sync");
-    }); // .namespace(join(__dirname, "..", "src/Controllers"));
+    }).namespace("Adonis/Addons/Acl/Controllers");
     // Add middleware to route group
     if (configACL.middlewares) {
       service.middleware(configACL.middlewares);
