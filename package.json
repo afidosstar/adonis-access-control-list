@@ -81,8 +81,11 @@
     "build/src",
     "build/providers",
     "build/adonis-typings",
+    "build/commands",
+    "build/middleware",
     "build/ressources",
     "build/templates",
+    "build/Exceptions",
     "build/index.d.ts",
     "build/index.js"
   ],
