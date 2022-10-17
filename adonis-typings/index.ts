@@ -10,5 +10,5 @@
  */
 
 /// <reference path="./auth.ts"/>
-//// <reference path="./request.ts"/>
+/// <reference path="./router.ts"/>
 /// <reference path="./adonis-access-control-list.ts"/>

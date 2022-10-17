@@ -14,6 +14,7 @@
     "clean": "del-cli build",
     "compile": "npm run lint && npm run clean && tsc && npm run copy:files",
     "build": "npm run compile",
+    "link": "npm run compile && npm link",
     "copy:files": "copyfiles 'instructions.md' build && copyfiles 'ressources/**/*.edge' build && copyfiles 'templates/**/*.txt' build",
     "prepublishOnly": "npm run build"
   },

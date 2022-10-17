@@ -48,6 +48,7 @@ export default class AclSetup extends BaseCommand {
       await this.generator.run();
       await task.complete();
     });
+    await tasksManager.run();
   }
 
   private async checkIfIsAlreadySetup(): Promise<boolean> {

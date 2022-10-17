@@ -93,7 +93,7 @@ export default class AccessControlProvider {
 
     (this as any).authorizeRoute = authorizeRoute;
 
-    this.middleware([`can:${authorizeRoute.name}`]);
+    //this.middleware([`can:${authorizeRoute.name}`]);
     return this;
   }
 
@@ -129,7 +129,7 @@ export default class AccessControlProvider {
       (route as any).authorizeRoute = authorizeRoute;
       middlewareMap[route.name] = [`can:${authorizeRoute.name}`];
     });
-    this.middleware(middlewareMap);
+    //this.middleware(middlewareMap);
     return this;
   }
 

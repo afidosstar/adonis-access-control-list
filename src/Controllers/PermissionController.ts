@@ -10,10 +10,10 @@
  */
 
 import { HttpContextContract } from "@ioc:Adonis/Core/HttpContext";
-import Permission from "../Models/Permission";
 import Database from "@ioc:Adonis/Lucid/Database";
 import { rules, schema } from "@ioc:Adonis/Core/Validator";
 //import Config from "@ioc:Adonis/Core/Config";
+import Permission from "../Models/Permission";
 
 export default class PermissionController {
   //private configs = Config.get("acl");
