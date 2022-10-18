@@ -30,9 +30,6 @@ export default class AccessControlProvider {
   constructor(protected app: ApplicationContract) {}
 
   private registerModel() {
-    this.app.container.bind("Adonis/Addons/Acl/BaseUser", () => {
-      return require("../src/Models/BaseUser").default;
-    });
     this.app.container.bind("Adonis/Addons/Acl/Role", () => {
       return this.bootModel(require("../src/Models/Role").default);
     });
@@ -53,10 +50,17 @@ export default class AccessControlProvider {
     });
   }
   private registerOther() {
-    this.app.container.singleton("Adonis/Addons/Acl/Decorator/AuthUser", () => {
-      const { authUser } = require("../src/Decorator/AuthUser");
-      return authUser;
-    });
+    this.app.container.singleton(
+      "Adonis/Addons/AdonisAccessControlList",
+      () => {
+        const { authUser } = require("../src/Decorator/AuthUser");
+        const { default: BaseUser } = require("../src/Models/BaseUser");
+        return {
+          authUser,
+          BaseUser,
+        };
+      }
+    );
     this.app.container.singleton(
       "Adonis/Addons/Acl/Controllers/PermissionController",
       () => {
