@@ -13,7 +13,6 @@ declare module "@ioc:Adonis/Addons/AdonisAccessControlList" {
   import { RouteMiddlewareHandler } from "@ioc:Adonis/Core/Route";
   import { NormalizeConstructor } from "@poppinss/utils/build/src/Helpers";
 
-
   export type AccessRouteContract = {
     name: string;
     description: string;
