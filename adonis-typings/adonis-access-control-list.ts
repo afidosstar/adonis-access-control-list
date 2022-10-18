@@ -8,7 +8,7 @@
  */
 
 declare module "@ioc:Adonis/Addons/AdonisAccessControlList" {
-  import { ColumnOptions } from "@ioc:Adonis/Lucid/Orm";
+  import { ColumnOptions, LucidRow } from "@ioc:Adonis/Lucid/Orm";
   import { GuardsList } from "@ioc:Adonis/Addons/Auth";
   import { LucidModel, ManyToMany } from "@ioc:Adonis/Lucid/Orm";
   import { RouteMiddlewareHandler } from "@ioc:Adonis/Core/Route";
@@ -35,7 +35,7 @@ declare module "@ioc:Adonis/Addons/AdonisAccessControlList" {
     apiOnly: boolean;
   }
 
-  export type AclAuthDecorator = (target: any, property: any) => void;
+  export type AclAuthDecorator = (target: LucidRow, property: string) => void;
 
   export interface AclAuthUser {
     getAccesses(): Promise<string[]>;

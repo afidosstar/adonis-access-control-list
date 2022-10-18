@@ -20,7 +20,7 @@ import { GuardContract, ProvidersList } from "@ioc:Adonis/Addons/Auth";
 export function authUser(
   options: Partial<AuthUserOptions> = { isUpdated: false }
 ): AclAuthDecorator {
-  return function (target: any, property: any) {
+  return function (target, property) {
     const Model = target.constructor as LucidModel;
     options = Object.assign({ isUpdated: false }, options || {});
     Model.boot();
