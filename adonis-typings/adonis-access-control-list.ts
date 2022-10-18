@@ -9,12 +9,10 @@
 
 declare module "@ioc:Adonis/Addons/AdonisAccessControlList" {
   import { ColumnOptions, LucidRow } from "@ioc:Adonis/Lucid/Orm";
-  import { LucidModel } from "@ioc:Adonis/Lucid/Orm";
+  import { LucidModel, ManyToMany } from "@ioc:Adonis/Lucid/Orm";
   import { RouteMiddlewareHandler } from "@ioc:Adonis/Core/Route";
+  import { NormalizeConstructor } from "@poppinss/utils/build/src/Helpers";
 
-  export type AuthUserOptions = ColumnOptions & {
-    isUpdated: boolean;
-  };
 
   export type AccessRouteContract = {
     name: string;
@@ -36,7 +34,9 @@ declare module "@ioc:Adonis/Addons/AdonisAccessControlList" {
 
   export type AclAuthDecorator = (target: LucidRow, property: string) => void;
 
-  export type AclAuthUser = {
+  export type AclAuthUser<K extends LucidModel, J extends LucidModel> = {
+    roles: ManyToMany<K>;
+    permissions: ManyToMany<J>;
     getAccesses(): Promise<string[]>;
 
     can(slug: string): Promise<boolean>;
@@ -47,8 +47,17 @@ declare module "@ioc:Adonis/Addons/AdonisAccessControlList" {
   };
 
   interface AuthUserFn {
-    (options: Partial<AuthUserOptions>): AclAuthDecorator;
+    (
+      options: Partial<ColumnOptions & { isUpdated?: boolean }>
+    ): AclAuthDecorator;
   }
+  type ExtendUser = <
+    T extends NormalizeConstructor<LucidModel>,
+    K extends LucidModel,
+    J extends LucidModel
+  >(
+    superclass: T
+  ) => T & AclAuthUser<K, J>;
   export const authUser: AuthUserFn;
-  export const BaseUser: LucidModel & AclAuthUser;
+  export const BaseUser: ExtendUser;
 }
