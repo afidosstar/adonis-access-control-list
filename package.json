@@ -98,6 +98,9 @@
     "providers": [
       "@fickou/adonis-access-control-list"
     ],
+    "commands": [
+      "@fickou/adonis-access-control-list/build/commands"
+    ],
     "templates": {
       "config": [
         "acl.txt"
