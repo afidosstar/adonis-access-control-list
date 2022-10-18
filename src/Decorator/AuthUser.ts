@@ -13,12 +13,12 @@ import { LucidModel, LucidRow } from "@ioc:Adonis/Lucid/Orm";
 import HttpContext from "@ioc:Adonis/Core/HttpContext";
 import {
   AclAuthDecorator,
-  AuthUserOptions,
+  AuthUserFn,
 } from "@ioc:Adonis/Addons/AdonisAccessControlList";
 import { GuardContract, ProvidersList } from "@ioc:Adonis/Addons/Auth";
 
-export function authUser(
-  options: Partial<AuthUserOptions> = { isUpdated: false }
+export const authUser: AuthUserFn = function (
+  options = { isUpdated: false }
 ): AclAuthDecorator {
   return function (target, property) {
     const Model = target.constructor as LucidModel;
@@ -44,4 +44,4 @@ export function authUser(
       }
     );
   };
-}
+};
