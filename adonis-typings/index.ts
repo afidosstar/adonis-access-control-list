@@ -9,6 +9,6 @@
  * file that was distributed with this source code.
  */
 
-/// <reference path="./auth.ts"/>
+//// <reference path="./auth.ts"/>
 /// <reference path="./router.ts"/>
 /// <reference path="./adonis-access-control-list.ts"/>
