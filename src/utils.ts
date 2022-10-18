@@ -9,12 +9,11 @@
  *
  */
 
-import {
+import Database, {
   DatabaseQueryBuilderContract,
   QueryClientContract,
   TransactionClientContract,
 } from "@ioc:Adonis/Lucid/Database";
-import { Database } from "@adonisjs/lucid/build/src/Database";
 import Config from "@ioc:Adonis/Core/Config";
 
 function buildQuery(
