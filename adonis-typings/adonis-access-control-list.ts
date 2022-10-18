@@ -47,7 +47,7 @@ declare module "@ioc:Adonis/Addons/AdonisAccessControlList" {
 
   interface AuthUserFn {
     (
-      options: Partial<ColumnOptions & { isUpdated?: boolean }>
+      options?: Partial<ColumnOptions & { isUpdated?: boolean }>
     ): AclAuthDecorator;
   }
   type ExtendUser = <
