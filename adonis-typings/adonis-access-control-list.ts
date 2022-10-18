@@ -13,15 +13,15 @@ declare module "@ioc:Adonis/Addons/AdonisAccessControlList" {
   import { LucidModel, ManyToMany } from "@ioc:Adonis/Lucid/Orm";
   import { RouteMiddlewareHandler } from "@ioc:Adonis/Core/Route";
 
-  export interface AuthUserOptions extends ColumnOptions {
+  export type AuthUserOptions = ColumnOptions & {
     isUpdated: boolean;
-  }
+  };
 
-  export interface AccessRouteContract {
+  export type AccessRouteContract = {
     name: string;
     description: string;
     group?: string;
-  }
+  };
 
   export interface ConfigAclContract {
     prefix: string | undefined;
@@ -37,7 +37,7 @@ declare module "@ioc:Adonis/Addons/AdonisAccessControlList" {
 
   export type AclAuthDecorator = (target: LucidRow, property: string) => void;
 
-  export interface AclAuthUser {
+  export type AclAuthUser = {
     getAccesses(): Promise<string[]>;
 
     can(slug: string): Promise<boolean>;
@@ -45,5 +45,10 @@ declare module "@ioc:Adonis/Addons/AdonisAccessControlList" {
     getRoles(): Promise<string[]>;
 
     getPermissions(): Promise<string[]>;
+  };
+
+  interface AuthUserFn {
+    (options: AuthUserOptions): AclAuthDecorator;
   }
+  export const authUser: AuthUserFn;
 }
