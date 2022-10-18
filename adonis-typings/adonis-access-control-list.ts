@@ -48,7 +48,7 @@ declare module "@ioc:Adonis/Addons/AdonisAccessControlList" {
   };
 
   interface AuthUserFn {
-    (options: AuthUserOptions): AclAuthDecorator;
+    (options: Partial<AuthUserOptions>): AclAuthDecorator;
   }
   export const authUser: AuthUserFn;
 }
