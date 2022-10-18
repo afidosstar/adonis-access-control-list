@@ -16,11 +16,13 @@ declare module "@ioc:Adonis/Addons/AdonisAccessControlList" {
   export interface AuthUserOptions extends ColumnOptions {
     isUpdated: boolean;
   }
+
   export interface AccessRouteContract {
     name: string;
     description: string;
     group?: string;
   }
+
   export interface ConfigAclContract {
     prefix: string | undefined;
     middlewares?: RouteMiddlewareHandler | RouteMiddlewareHandler[];
@@ -32,5 +34,16 @@ declare module "@ioc:Adonis/Addons/AdonisAccessControlList" {
     };
     apiOnly: boolean;
   }
+
   export type AclAuthDecorator = (target: any, property: any) => void;
+
+  export interface AclAuthUser {
+    getAccesses(): Promise<string[]>;
+
+    can(slug: string): Promise<boolean>;
+
+    getRoles(): Promise<string[]>;
+
+    getPermissions(): Promise<string[]>;
+  }
 }

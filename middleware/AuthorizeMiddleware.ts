@@ -12,6 +12,8 @@
 import { HttpContextContract } from "@ioc:Adonis/Core/HttpContext";
 import _ from "lodash";
 import AccessDeniedException from "../Exceptions/AccessDiniedException";
+import { AclAuthUser } from "@ioc:Adonis/Addons/AdonisAccessControlList";
+import AuthNotConfiguredException from "../Exceptions/AuthNotConfiguredException";
 
 export default class AuthorizeMiddleware {
   public async handle(
@@ -20,11 +22,15 @@ export default class AuthorizeMiddleware {
     allowedAccesses: string[]
   ) {
     // code for middleware goes here. ABOVE THE NEXT CALL
-    if (_.has(route, "meta.authorizeRoute")) {
+    if (!_.has(route, "meta.authorizeRoute")) {
       return next();
     }
 
-    const user = (await auth.authenticate()) as any;
+    if (!auth) {
+      throw new AuthNotConfiguredException();
+    }
+
+    const user = (await auth.authenticate()) as AclAuthUser;
     if (await user.can(allowedAccesses[0])) {
       return next();
     }

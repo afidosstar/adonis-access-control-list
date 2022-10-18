@@ -75,8 +75,10 @@ export default class AccessControlProvider {
   }
 
   public boot() {
-    const Route = this.app.container.use("Adonis/Core/Route");
-    const configACL = this.app.container.use("Adonis/Core/Config").get("acl");
+    const Route = this.app.container.resolveBinding("Adonis/Core/Route");
+    const configACL = this.app.container
+      .resolveBinding("Adonis/Core/Config")
+      .get("acl");
 
     Route.Route.macro("toJSON", this.toJSON);
 
@@ -130,7 +132,7 @@ export default class AccessControlProvider {
       };
 
       (route as any).authorizeRoute = authorizeRoute;
-      middlewareMap[route.name] = [`can:${authorizeRoute.name}`];
+      middlewareMap[route.name] = [`authorize:${authorizeRoute.name}`];
     });
     //this.middleware(middlewareMap);
     return this;

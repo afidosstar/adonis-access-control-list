@@ -2,6 +2,7 @@ import { ConfigAclContract } from "@ioc:Adonis/Addons/AdonisAccessControlList";
 
 const configAcl: ConfigAclContract = {
   prefix: "acl",
+  // acl Middleware name
   middlewares: "auth:api",
   joinTables: {
     permissionAccess: "permission_access",
