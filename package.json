@@ -88,7 +88,8 @@
     "build/templates",
     "build/Exceptions",
     "build/index.d.ts",
-    "build/index.js"
+    "build/index.js",
+    "build/instructions.md"
   ],
   "types": "build/adonis-typings",
   "typings": "build/adonis-typings",
