@@ -57,7 +57,7 @@ declare module "@ioc:Adonis/Addons/AdonisAccessControlList" {
   >(
     superclass: T
   ) => T & {
-    new (): AclAuthUser<K, J>;
+    new (...args: any[]): AclAuthUser<K, J>;
   };
   export const authUser: AuthUserFn;
   export const BaseUser: ExtendUser;
