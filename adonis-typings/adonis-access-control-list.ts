@@ -56,7 +56,9 @@ declare module "@ioc:Adonis/Addons/AdonisAccessControlList" {
     J extends LucidModel
   >(
     superclass: T
-  ) => T & AclAuthUser<K, J>;
+  ) => T & {
+    new (): AclAuthUser<K, J>;
+  };
   export const authUser: AuthUserFn;
   export const BaseUser: ExtendUser;
 }
