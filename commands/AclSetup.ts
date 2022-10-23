@@ -35,16 +35,24 @@ export default class AclSetup extends BaseCommand {
       return false;
     }
 
+    const joinTables = this.application.container
+      .use("Adonis/Core/Config")
+      .get("acl.joinTables", {});
+
     const tasksManager = this.ui.tasks();
     tasksManager.add("Make migration", async (_logger, task) => {
       const index = Date.now();
       this.addMigration("accesses", index)
         .addMigration("roles", index + 1)
         .addMigration("permissions", index + 2)
-        .addMigration("permissions_accesses", index + 3)
-        .addMigration("permissions_roles", index + 4)
-        .addMigration("permissions_users", index + 5)
-        .addMigration("users_roles", index + 6);
+        .addMigration(
+          "permissions_accesses",
+          index + 3,
+          joinTables.permissionAccess
+        )
+        .addMigration("permissions_roles", index + 4, joinTables.permissionRole)
+        .addMigration("permissions_users", index + 5, joinTables.permissionUser)
+        .addMigration("users_roles", index + 6, joinTables.userRole);
       await this.generator.run();
       await task.complete();
     });
@@ -58,7 +66,7 @@ export default class AclSetup extends BaseCommand {
     return data.some((val) => /accesses/.test(val));
   }
 
-  private addMigration(name: string, index: number): this {
+  private addMigration(name: string, index: number, tableName?: string): this {
     this.generator
       .addFile(`${index}_${name}`, {
         pattern: "snakecase",
@@ -67,7 +75,7 @@ export default class AclSetup extends BaseCommand {
       .destinationDir("database/migrations")
       .useMustache()
       .stub(join(__dirname, `../templates/migrations/${name}.txt`))
-      .apply({ name });
+      .apply({ tableName: tableName || name });
     return this;
   }
 }
