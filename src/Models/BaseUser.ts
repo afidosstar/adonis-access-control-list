@@ -28,7 +28,7 @@ const { permissionUser, userRole } = Config.get("acl.joinTables");
  * @param superclass
  * @constructor
  */
-export default function BaseUser<T extends NormalizeConstructor<LucidModel>>(
+export function BaseUser<T extends NormalizeConstructor<LucidModel>>(
   superclass: T
 ) {
   class Mixin extends superclass {

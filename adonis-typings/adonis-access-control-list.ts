@@ -8,8 +8,12 @@
  */
 
 declare module "@ioc:Adonis/Addons/AdonisAccessControlList" {
-  import { ColumnOptions, LucidRow } from "@ioc:Adonis/Lucid/Orm";
-  import { LucidModel, ManyToMany } from "@ioc:Adonis/Lucid/Orm";
+  import {
+    ColumnOptions,
+    LucidRow,
+    LucidModel,
+    ManyToMany,
+  } from "@ioc:Adonis/Lucid/Orm";
   import { RouteMiddlewareHandler } from "@ioc:Adonis/Core/Route";
   import { NormalizeConstructor } from "@poppinss/utils/build/src/Helpers";
 

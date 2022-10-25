@@ -54,7 +54,7 @@ export default class AccessControlProvider {
       "Adonis/Addons/AdonisAccessControlList",
       () => {
         const { authUser } = require("../src/Decorator/AuthUser");
-        const { default: BaseUser } = require("../src/Models/BaseUser");
+        const { BaseUser } = require("../src/Models/BaseUser");
         return {
           authUser,
           BaseUser,
