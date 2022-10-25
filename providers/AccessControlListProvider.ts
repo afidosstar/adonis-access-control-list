@@ -14,18 +14,15 @@ import {
   RouteContract,
   RouteJSON,
   RouteMiddlewareHandler,
-  RouteResourceContract,
+  RouteResourceContract
 } from "@ioc:Adonis/Core/Route";
 import { ApplicationContract } from "@ioc:Adonis/Core/Application";
-import {
-  AccessRouteContract,
-  ConfigAclContract,
-} from "@ioc:Adonis/Addons/AdonisAccessControlList";
+import { AccessRouteContract, ConfigAclContract } from "@ioc:Adonis/Addons/AdonisAccessControlList";
 import { join } from "path";
 import { LucidModel } from "@ioc:Adonis/Lucid/Orm";
 
 export default class AccessControlProvider {
-  public needsApplication: boolean = true;
+  public static needsApplication: boolean = true;
 
   constructor(protected app: ApplicationContract) {}
 
@@ -91,13 +88,11 @@ export default class AccessControlProvider {
   }
 
   private accessCallbackFn(this: RouteContract, name, description, group) {
-    const authorizeRoute: AccessRouteContract = {
+    (this as any).authorizeRoute = {
       name: name,
       description: description || "",
       group: group,
     };
-
-    (this as any).authorizeRoute = authorizeRoute;
 
     //this.middleware([`can:${authorizeRoute.name}`]);
     return this;
