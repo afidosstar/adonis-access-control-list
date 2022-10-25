@@ -8,14 +8,20 @@
  *  file that was distributed with this source code.
  *
  */
+/// <reference types="@adonisjs/lucid" />
 
+import "reflect-metadata";
 import HttpContext from "@ioc:Adonis/Core/HttpContext";
-import { LucidModel, LucidRow } from "@ioc:Adonis/Lucid/Orm";
+import { LucidModel } from "@ioc:Adonis/Lucid/Orm";
 import {
   AclAuthDecorator,
   AuthUserFn,
 } from "@ioc:Adonis/Addons/AdonisAccessControlList";
-import { GuardContract, GuardsList, ProvidersList } from "@ioc:Adonis/Addons/Auth";
+import {
+  GuardContract,
+  GuardsList,
+  ProvidersList,
+} from "@ioc:Adonis/Addons/Auth";
 
 export const authUser: AuthUserFn = function (
   options = { isUpdated: false }
@@ -27,7 +33,7 @@ export const authUser: AuthUserFn = function (
     Model.$addColumn(property, options);
     Model.before(
       options.isUpdated ? "update" : "create",
-      async function (entity: LucidRow) {
+      async function (entity) {
         const ctx = HttpContext.get();
         if (!ctx) {
           return;
