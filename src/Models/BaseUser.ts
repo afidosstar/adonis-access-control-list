@@ -8,6 +8,7 @@
  *  file that was distributed with this source code.
  *
  */
+/// <reference types="@adonisjs/lucid" />
 
 import { LucidModel, ManyToMany, manyToMany } from "@ioc:Adonis/Lucid/Orm";
 import { NormalizeConstructor } from "@poppinss/utils/build/src/Helpers";
