@@ -11,40 +11,33 @@
 
 import { DateTime } from "luxon";
 import {
-  LucidModel,
-  ManyToMany,
-  ManyToManyDecorator,
-} from "@ioc:Adonis/Lucid/Orm";
-import { ConfigContract } from "@ioc:Adonis/Core/Config";
-
-export default (
-  BaseModel: LucidModel,
-  manyToMany: ManyToManyDecorator,
+  BaseModel,
   column,
-  Config: ConfigContract,
-  Permission: LucidModel
-) => {
-  const { permissionRole } = Config.get("acl.joinTables");
-  class Role extends BaseModel {
-    @column({ isPrimary: true })
-    public id: number;
+  ManyToMany,
+  manyToMany,
+} from "@ioc:Adonis/Lucid/Orm";
+import Permission from "./Permission";
+import Config from "@ioc:Adonis/Core/Config";
+const { permissionRole } = Config.get("acl.joinTables");
 
-    @column() public name: string;
+export default class Role extends BaseModel {
+  @column({ isPrimary: true })
+  public id: number;
 
-    @column() public slug: string;
+  @column() public name: string;
 
-    @column() public description: string;
+  @column() public slug: string;
 
-    @manyToMany(() => Permission, {
-      pivotTable: permissionRole,
-    })
-    public permissions: ManyToMany<typeof Permission>;
+  @column() public description: string;
 
-    @column.dateTime({ autoCreate: true })
-    public createdAt: DateTime;
+  @manyToMany(() => Permission, {
+    pivotTable: permissionRole,
+  })
+  public permissions: ManyToMany<typeof Permission>;
 
-    @column.dateTime({ autoCreate: true, autoUpdate: true })
-    public updatedAt: DateTime;
-  }
-  return Role;
-};
+  @column.dateTime({ autoCreate: true })
+  public createdAt: DateTime;
+
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  public updatedAt: DateTime;
+}
