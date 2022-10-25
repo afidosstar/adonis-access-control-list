@@ -16,7 +16,6 @@ import {
   manyToMany,
   ManyToMany,
 } from "@ioc:Adonis/Lucid/Orm";
-//import Access from "./Access";
 import Config from "@ioc:Adonis/Core/Config";
 import Access from "@ioc:Adonis/Addons/Acl/Models/Access";
 const { permissionAccess } = Config.get("acl.joinTables");

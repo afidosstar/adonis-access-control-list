@@ -28,13 +28,19 @@ export default class AccessControlProvider {
 
   private registerModel() {
     this.app.container.bind("Adonis/Addons/Acl/Models/Access", () => {
-      return this.bootModel(require("../src/Models/Access").default);
+      const Access = require("../src/Models/Access").default;
+      console.log("Access", Access);
+      return this.bootModel(Access);
     });
     this.app.container.bind("Adonis/Addons/Acl/Models/Role", () => {
-      return this.bootModel(require("../src/Models/Role").default);
+      const Role = require("../src/Models/Role").default;
+      console.log("Role", Role);
+      return this.bootModel(Role);
     });
     this.app.container.bind("Adonis/Addons/Acl/Models/Permission", () => {
-      return this.bootModel(require("../src/Models/Permission").default);
+      const Permission = require("../src/Models/Permission").default;
+      console.log("Permission", Permission);
+      return this.bootModel(Permission);
     });
   }
 
@@ -68,11 +74,11 @@ export default class AccessControlProvider {
 
   public register() {
     this.registerModel();
-    this.registerOther();
     this.registerMiddleware();
   }
 
   public boot() {
+    this.registerOther();
     const Route = this.app.container.resolveBinding("Adonis/Core/Route");
     const configACL = this.app.container
       .resolveBinding("Adonis/Core/Config")

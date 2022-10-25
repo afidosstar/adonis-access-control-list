@@ -80,7 +80,10 @@ export function checkAccess(
     .then((res) => res.length > 0);
 }
 
-export function getUserRoles(userId: number, trx?: TransactionClientContract) {
+export function getUserRoles(
+  userId: number,
+  trx?: TransactionClientContract
+): Promise<Array<string>> {
   const { userRole } = Config.get("acl.joinTables");
   return ((trx || Database) as QueryClientContract | TransactionClientContract)
     .query()
@@ -96,7 +99,7 @@ export function getUserRoles(userId: number, trx?: TransactionClientContract) {
 export function getUserPermissions(
   userId: number,
   trx?: TransactionClientContract
-) {
+): Promise<Array<string>> {
   const { permissionRole, permissionUser, userRole } =
     Config.get("acl.joinTables");
   return ((trx || Database) as QueryClientContract | TransactionClientContract)
