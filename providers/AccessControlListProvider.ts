@@ -25,7 +25,7 @@ import { join } from "path";
 import { LucidModel } from "@ioc:Adonis/Lucid/Orm";
 
 export default class AccessControlProvider {
-  public needApplication: boolean = true;
+  public needsApplication: boolean = true;
 
   constructor(protected app: ApplicationContract) {}
 
