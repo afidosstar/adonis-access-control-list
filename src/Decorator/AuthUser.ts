@@ -12,10 +12,7 @@
 
 import "reflect-metadata";
 import { LucidModel } from "@ioc:Adonis/Lucid/Orm";
-import {
-  AclAuthDecorator,
-  AuthUserFn,
-} from "@ioc:Adonis/Addons/AdonisAccessControlList";
+import { AclAuthDecorator, AuthUserFn } from "@ioc:Adonis/Addons/Acl";
 // import {
 //   GuardContract,
 //   GuardsList,

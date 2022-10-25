@@ -1,6 +1,6 @@
 import { BaseCommand } from "@adonisjs/core/build/standalone";
 import * as _ from "lodash";
-import { AccessRouteContract } from "@ioc:Adonis/Addons/AdonisAccessControlList";
+import { AccessRouteContract } from "@ioc:Adonis/Addons/Acl";
 import { snakeCase } from "snake-case";
 
 export default class AclStoreAccess extends BaseCommand {

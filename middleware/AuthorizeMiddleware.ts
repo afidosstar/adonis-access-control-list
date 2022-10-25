@@ -12,7 +12,7 @@
 import { HttpContextContract } from "@ioc:Adonis/Core/HttpContext";
 import _ from "lodash";
 import AccessDeniedException from "../Exceptions/AccessDiniedException";
-import { AclAuthUser } from "@ioc:Adonis/Addons/AdonisAccessControlList";
+import { AclAuthUser } from "@ioc:Adonis/Addons/Acl";
 import AuthNotConfiguredException from "../Exceptions/AuthNotConfiguredException";
 
 export default class AuthorizeMiddleware {

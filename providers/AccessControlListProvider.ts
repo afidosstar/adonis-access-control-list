@@ -17,10 +17,7 @@ import {
   RouteResourceContract,
 } from "@ioc:Adonis/Core/Route";
 import { ApplicationContract } from "@ioc:Adonis/Core/Application";
-import {
-  AccessRouteContract,
-  ConfigAclContract,
-} from "@ioc:Adonis/Addons/AdonisAccessControlList";
+import { AccessRouteContract, ConfigAclContract } from "@ioc:Adonis/Addons/Acl";
 import { join } from "path";
 import { LucidModel } from "@ioc:Adonis/Lucid/Orm";
 
@@ -30,13 +27,13 @@ export default class AccessControlProvider {
   constructor(protected app: ApplicationContract) {}
 
   private registerModel() {
-    this.app.container.bind("Adonis/Addons/Acl/Role", () => {
-      return this.bootModel(require("../src/Models/Role").default);
-    });
-    this.app.container.bind("Adonis/Addons/Acl/Access", () => {
+    this.app.container.bind("Adonis/Addons/Acl/Models/Access", () => {
       return this.bootModel(require("../src/Models/Access").default);
     });
-    this.app.container.bind("Adonis/Addons/Acl/Permission", () => {
+    this.app.container.bind("Adonis/Addons/Acl/Models/Role", () => {
+      return this.bootModel(require("../src/Models/Role").default);
+    });
+    this.app.container.bind("Adonis/Addons/Acl/Models/Permission", () => {
       return this.bootModel(require("../src/Models/Permission").default);
     });
   }
@@ -50,7 +47,7 @@ export default class AccessControlProvider {
     });
   }
   private registerOther() {
-    this.app.container.bind("Adonis/Addons/AdonisAccessControlList", () => {
+    this.app.container.bind("Adonis/Addons/Acl", () => {
       const { authUser } = require("../src/Decorator/AuthUser");
       const { BaseUser } = require("../src/Models/BaseUser");
       return {
@@ -71,8 +68,8 @@ export default class AccessControlProvider {
 
   public register() {
     this.registerModel();
-    this.registerMiddleware();
     this.registerOther();
+    this.registerMiddleware();
   }
 
   public boot() {

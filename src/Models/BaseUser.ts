@@ -8,12 +8,9 @@
  *  file that was distributed with this source code.
  *
  */
-/// <reference types="@adonisjs/lucid" />
 
 import { LucidModel, ManyToMany, manyToMany } from "@ioc:Adonis/Lucid/Orm";
 import { NormalizeConstructor } from "@poppinss/utils/build/src/Helpers";
-import Role from "./Role";
-import Permission from "./Permission";
 import Config from "@ioc:Adonis/Core/Config";
 import {
   checkAccess,
@@ -21,6 +18,8 @@ import {
   getUserPermissions,
   getUserRoles,
 } from "../utils";
+import Permission from "@ioc:Adonis/Addons/Acl/Models/Permission";
+import Role from "@ioc:Adonis/Addons/Acl/Models/Role";
 const { permissionUser, userRole } = Config.get("acl.joinTables");
 
 /**

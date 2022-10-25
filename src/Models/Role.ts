@@ -16,8 +16,9 @@ import {
   ManyToMany,
   manyToMany,
 } from "@ioc:Adonis/Lucid/Orm";
-import Permission from "./Permission";
 import Config from "@ioc:Adonis/Core/Config";
+import Permission from "@ioc:Adonis/Addons/Acl/Models/Permission";
+
 const { permissionRole } = Config.get("acl.joinTables");
 
 export default class Role extends BaseModel {
