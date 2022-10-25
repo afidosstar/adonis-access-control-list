@@ -10,7 +10,6 @@
  */
 
 import { LucidModel, LucidRow } from "@ioc:Adonis/Lucid/Orm";
-import HttpContext from "@ioc:Adonis/Core/HttpContext";
 import {
   AclAuthDecorator,
   AuthUserFn,
@@ -28,6 +27,9 @@ export const authUser: AuthUserFn = function (
     Model.before(
       options.isUpdated ? "update" : "create",
       async function (entity: LucidRow) {
+        const { default: HttpContext } = await import(
+          "@ioc:Adonis/Core/HttpContext"
+        );
         const ctx = HttpContext.get();
         if (!ctx) {
           return;
