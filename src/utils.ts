@@ -9,118 +9,140 @@
  *
  */
 
-import Database, {
+import {
+  DatabaseContract,
   DatabaseQueryBuilderContract,
   QueryClientContract,
   TransactionClientContract,
 } from "@ioc:Adonis/Lucid/Database";
-import Config from "@ioc:Adonis/Core/Config";
+import { ConfigContract } from "@ioc:Adonis/Core/Config";
 
-function buildQuery(
-  trx?: TransactionClientContract
-): DatabaseQueryBuilderContract<any> {
-  const { permissionAccess, permissionRole, permissionUser, userRole } =
-    Config.get("acl.joinTables");
-  return ((trx || Database) as QueryClientContract | TransactionClientContract)
-    .query()
-    .from("accesses")
-    .distinct("accesses.slug")
-    .leftJoin(permissionAccess, `${permissionAccess}.access_id`, "accesses.id")
-    .leftJoin(
-      "permissions",
-      `${permissionAccess}.permission_id`,
-      "permissions.id"
+export default function useFn(
+  Config: ConfigContract,
+  Database: DatabaseContract
+) {
+  function buildQuery(
+    trx?: TransactionClientContract
+  ): DatabaseQueryBuilderContract<any> {
+    const { permissionAccess, permissionRole, permissionUser, userRole } =
+      Config.get("acl.joinTables");
+    return (
+      (trx || Database) as QueryClientContract | TransactionClientContract
     )
-    .leftJoin(
-      "permissions",
-      `${permissionAccess}.permission_id`,
-      "permissions.id"
-    )
+      .query()
+      .from("accesses")
+      .distinct("accesses.slug")
+      .leftJoin(
+        permissionAccess,
+        `${permissionAccess}.access_id`,
+        "accesses.id"
+      )
+      .leftJoin(
+        "permissions",
+        `${permissionAccess}.permission_id`,
+        "permissions.id"
+      )
+      .leftJoin(
+        "permissions",
+        `${permissionAccess}.permission_id`,
+        "permissions.id"
+      )
 
-    .leftJoin(
-      permissionUser,
-      `${permissionUser}.permission_id`,
-      "permissions.id"
-    )
-    .leftJoin(
-      permissionRole,
-      `${permissionRole}.permission_id`,
-      "permissions.id"
-    )
-    .leftJoin("roles", `${permissionRole}.roles_id`, "roles.id")
-    .leftJoin(`${userRole}`, `${userRole}.roles_id`, "roles.id");
-}
+      .leftJoin(
+        permissionUser,
+        `${permissionUser}.permission_id`,
+        "permissions.id"
+      )
+      .leftJoin(
+        permissionRole,
+        `${permissionRole}.permission_id`,
+        "permissions.id"
+      )
+      .leftJoin("roles", `${permissionRole}.roles_id`, "roles.id")
+      .leftJoin(`${userRole}`, `${userRole}.roles_id`, "roles.id");
+  }
 
-export async function getUserAccessSlug(
-  userId: number,
-  trx?: TransactionClientContract
-): Promise<Array<string>> {
-  const { permissionUser, userRole } = Config.get("acl.joinTables");
-  return buildQuery(trx)
-    .where(`${permissionUser}.user_id`, userId)
-    .orWhere(`${userRole}.user_id`, userId)
-    .then((res) => {
-      return res.map((r) => r.slug);
-    });
-}
+  async function getUserAccessSlug(
+    userId: number,
+    trx?: TransactionClientContract
+  ): Promise<Array<string>> {
+    const { permissionUser, userRole } = Config.get("acl.joinTables");
+    return buildQuery(trx)
+      .where(`${permissionUser}.user_id`, userId)
+      .orWhere(`${userRole}.user_id`, userId)
+      .then((res) => {
+        return res.map((r) => r.slug);
+      });
+  }
 
-export function checkAccess(
-  userId: number,
-  slug: string,
-  trx?: TransactionClientContract
-): Promise<boolean> {
-  const { permissionUser, userRole } = Config.get("acl.joinTables");
-  return buildQuery(trx)
-    .where((qb) =>
-      qb
-        .where(`${permissionUser}.user_id`, userId)
-        .orWhere(`${userRole}.user_id`, userId)
-    )
-    .where("accesses.slug", slug)
-    .then((res) => res.length > 0);
-}
+  function checkAccess(
+    userId: number,
+    slug: string,
+    trx?: TransactionClientContract
+  ): Promise<boolean> {
+    const { permissionUser, userRole } = Config.get("acl.joinTables");
+    return buildQuery(trx)
+      .where((qb) =>
+        qb
+          .where(`${permissionUser}.user_id`, userId)
+          .orWhere(`${userRole}.user_id`, userId)
+      )
+      .where("accesses.slug", slug)
+      .then((res) => res.length > 0);
+  }
 
-export function getUserRoles(
-  userId: number,
-  trx?: TransactionClientContract
-): Promise<Array<string>> {
-  const { userRole } = Config.get("acl.joinTables");
-  return ((trx || Database) as QueryClientContract | TransactionClientContract)
-    .query()
-    .from("roles")
-    .distinct("roles.slug")
-    .leftJoin(userRole, `${userRole}.role_id`, "roles.id")
-    .where(`${userRole}.user_id`, userId)
-    .then((res) => {
-      return res.map((r) => r.slug);
-    });
-}
+  function getUserRoles(
+    userId: number,
+    trx?: TransactionClientContract
+  ): Promise<Array<string>> {
+    const { userRole } = Config.get("acl.joinTables");
+    return (
+      (trx || Database) as QueryClientContract | TransactionClientContract
+    )
+      .query()
+      .from("roles")
+      .distinct("roles.slug")
+      .leftJoin(userRole, `${userRole}.role_id`, "roles.id")
+      .where(`${userRole}.user_id`, userId)
+      .then((res) => {
+        return res.map((r) => r.slug);
+      });
+  }
 
-export function getUserPermissions(
-  userId: number,
-  trx?: TransactionClientContract
-): Promise<Array<string>> {
-  const { permissionRole, permissionUser, userRole } =
-    Config.get("acl.joinTables");
-  return ((trx || Database) as QueryClientContract | TransactionClientContract)
-    .query()
-    .from("permissions")
-    .distinct("permissions.slug")
-    .leftJoin(
-      permissionUser,
-      `${permissionUser}.permission_id`,
-      "permissions.id"
+  function getUserPermissions(
+    userId: number,
+    trx?: TransactionClientContract
+  ): Promise<Array<string>> {
+    const { permissionRole, permissionUser, userRole } =
+      Config.get("acl.joinTables");
+    return (
+      (trx || Database) as QueryClientContract | TransactionClientContract
     )
-    .leftJoin(
-      permissionRole,
-      `${permissionRole}.permission_id`,
-      "permissions.id"
-    )
-    .leftJoin("roles", `${permissionRole}.role_id`, "roles.id")
-    .leftJoin(userRole, `${userRole}.role_id`, "roles.id")
-    .where(`${userRole}.user_id`, userId)
-    .where(`${permissionUser}.user_id`, userId)
-    .then((res) => {
-      return res.map((r) => r.slug);
-    });
+      .query()
+      .from("permissions")
+      .distinct("permissions.slug")
+      .leftJoin(
+        permissionUser,
+        `${permissionUser}.permission_id`,
+        "permissions.id"
+      )
+      .leftJoin(
+        permissionRole,
+        `${permissionRole}.permission_id`,
+        "permissions.id"
+      )
+      .leftJoin("roles", `${permissionRole}.role_id`, "roles.id")
+      .leftJoin(userRole, `${userRole}.role_id`, "roles.id")
+      .where(`${userRole}.user_id`, userId)
+      .where(`${permissionUser}.user_id`, userId)
+      .then((res) => {
+        return res.map((r) => r.slug);
+      });
+  }
+  return {
+    getUserAccessSlug,
+    getUserPermissions,
+    getUserRoles,
+    checkAccess,
+  };
 }

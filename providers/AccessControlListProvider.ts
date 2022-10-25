@@ -20,6 +20,7 @@ import { ApplicationContract } from "@ioc:Adonis/Core/Application";
 import { AccessRouteContract, ConfigAclContract } from "@ioc:Adonis/Addons/Acl";
 import { join } from "path";
 import { LucidModel } from "@ioc:Adonis/Lucid/Orm";
+import { authUser } from "../src/Decorator/AuthUser";
 
 export default class AccessControlProvider {
   public static needsApplication: boolean = true;
@@ -27,21 +28,44 @@ export default class AccessControlProvider {
   constructor(protected app: ApplicationContract) {}
 
   private registerModel() {
-    this.app.container.bind("Adonis/Addons/Acl/Models/Access", () => {
-      const Access = require("../src/Models/Access").default;
-      console.log("Access", Access);
-      return this.bootModel(Access);
-    });
-    this.app.container.bind("Adonis/Addons/Acl/Models/Role", () => {
-      const Role = require("../src/Models/Role").default;
-      console.log("Role", Role);
-      return this.bootModel(Role);
-    });
-    this.app.container.bind("Adonis/Addons/Acl/Models/Permission", () => {
-      const Permission = require("../src/Models/Permission").default;
-      console.log("Permission", Permission);
-      return this.bootModel(Permission);
-    });
+    this.app.container.withBindings(
+      ["Adonis/Lucid/Orm", "Adonis/Core/Config"],
+      ({ BaseModel, manyToMany, column }, Config) => {
+        this.app.container.singleton("Adonis/Addons/Acl/Models/Access", () => {
+          return this.bootModel(
+            require("../src/Models/Access").default(BaseModel, column)
+          );
+        });
+        this.app.container.bind("Adonis/Addons/Acl/Models/Permission", () => {
+          console.log("Adonis/Addons/Acl/Models/Permission");
+          return this.bootModel(
+            require("../src/Models/Permission").default(
+              BaseModel,
+              manyToMany,
+              column,
+              Config,
+              this.app.container.resolveBinding(
+                "Adonis/Addons/Acl/Models/Access"
+              )
+            )
+          );
+        });
+        this.app.container.bind("Adonis/Addons/Acl/Models/Role", () => {
+          console.log("Adonis/Addons/Acl/Models/Role");
+          return this.bootModel(
+            require("../src/Models/Role").default(
+              BaseModel,
+              manyToMany,
+              column,
+              Config,
+              this.app.container.resolveBinding(
+                "Adonis/Addons/Acl/Models/Permission"
+              )
+            )
+          );
+        });
+      }
+    );
   }
 
   private registerMiddleware() {
@@ -53,14 +77,31 @@ export default class AccessControlProvider {
     });
   }
   private registerOther() {
-    this.app.container.bind("Adonis/Addons/Acl", () => {
-      const { authUser } = require("../src/Decorator/AuthUser");
-      const { BaseUser } = require("../src/Models/BaseUser");
-      return {
-        authUser,
-        BaseUser,
-      };
-    });
+    this.app.container.withBindings(
+      [
+        "Adonis/Addons/Acl/Models/Role",
+        "Adonis/Addons/Acl/Models/Permission",
+        "Adonis/Core/Config",
+        "Adonis/Lucid/Orm",
+        "Adonis/Lucid/Database",
+      ],
+      (Permission, Role, Config, { manyToMany }, Database) => {
+        this.app.container.singleton("Adonis/Addons/Acl", () => {
+          const BaseUser = require("../src/Models/BaseUser").default(
+            require("../src/utils").default(Config, Database),
+            manyToMany,
+            Permission,
+            Role,
+            Config
+          );
+          return {
+            authUser,
+            BaseUser,
+          };
+        });
+      }
+    );
+
     this.app.container.singleton(
       "Adonis/Addons/Acl/Controllers/PermissionController",
       () => {
@@ -75,10 +116,10 @@ export default class AccessControlProvider {
   public register() {
     this.registerModel();
     this.registerMiddleware();
+    this.registerOther();
   }
 
   public boot() {
-    this.registerOther();
     const Route = this.app.container.resolveBinding("Adonis/Core/Route");
     const configACL = this.app.container
       .resolveBinding("Adonis/Core/Config")

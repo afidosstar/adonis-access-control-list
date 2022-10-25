@@ -9,70 +9,83 @@
  *
  */
 
-import Permission from "@ioc:Adonis/Addons/Acl/Models/Permission";
-import Role from "@ioc:Adonis/Addons/Acl/Models/Role";
-import { LucidModel, ManyToMany, manyToMany } from "@ioc:Adonis/Lucid/Orm";
-import { NormalizeConstructor } from "@poppinss/utils/build/src/Helpers";
-import Config from "@ioc:Adonis/Core/Config";
 import {
-  checkAccess,
-  getUserAccessSlug,
-  getUserPermissions,
-  getUserRoles,
-} from "../utils";
-const { permissionUser, userRole } = Config.get("acl.joinTables");
+  LucidModel,
+  ManyToMany,
+  ManyToManyDecorator,
+} from "@ioc:Adonis/Lucid/Orm";
+import { NormalizeConstructor } from "@poppinss/utils/build/src/Helpers";
+import { ConfigContract } from "@ioc:Adonis/Core/Config";
 
 /**
  * This is the base user model that you should extend from for your user model.
  *
- * @param superclass
  * @constructor
+ * @param checkAccess
+ * @param getUserAccessSlug
+ * @param getUserPermissions
+ * @param getUserRoles
+ * @param manyToMany
+ * @param Permission
+ * @param Role
+ * @param Config
  */
-export function BaseUser<T extends NormalizeConstructor<LucidModel>>(
-  superclass: T
+export default function (
+  { checkAccess, getUserAccessSlug, getUserPermissions, getUserRoles },
+  manyToMany: ManyToManyDecorator,
+  Permission: LucidModel,
+  Role: LucidModel,
+  Config: ConfigContract
 ) {
-  class Mixin extends superclass {
-    @manyToMany(() => Role, {
-      pivotTable: userRole,
-      pivotForeignKey: "user_id",
-      pivotRelatedForeignKey: "role_id",
-    })
-    public roles: ManyToMany<typeof Role>;
+  const { permissionUser, userRole } = Config.get("acl.joinTables");
+  return function BaseUser<T extends NormalizeConstructor<LucidModel>>(
+    superclass: T
+  ) {
+    class Mixin extends superclass {
+      @manyToMany(() => Role, {
+        pivotTable: userRole,
+        pivotForeignKey: "user_id",
+        pivotRelatedForeignKey: "role_id",
+      })
+      public roles: ManyToMany<typeof Role>;
 
-    @manyToMany(() => Permission, {
-      pivotTable: permissionUser,
-      pivotForeignKey: "user_id",
-      pivotRelatedForeignKey: "permission_id",
-    })
-    public permissions: ManyToMany<typeof Permission>;
+      @manyToMany(() => Permission, {
+        pivotTable: permissionUser,
+        pivotForeignKey: "user_id",
+        pivotRelatedForeignKey: "permission_id",
+      })
+      public permissions: ManyToMany<typeof Permission>;
 
-    public getAccesses(): Promise<string[]> {
-      return getUserAccessSlug(
-        this.$attributes[this.$primaryKeyValue || "id"],
-        this.$trx
-      );
+      public getAccesses(): Promise<string[]> {
+        return getUserAccessSlug(
+          this.$attributes[this.$primaryKeyValue || "id"],
+          this.$trx
+        );
+      }
+
+      public async can(slug: string): Promise<boolean> {
+        return checkAccess(
+          this.$attributes[this.$primaryKeyValue || "id"],
+          slug,
+          this.$trx
+        );
+      }
+
+      public async getRoles(): Promise<string[]> {
+        return getUserRoles(
+          this.$attributes[this.$primaryKeyValue || "id"],
+          this.$trx
+        );
+      }
+
+      public async getPermissions(): Promise<string[]> {
+        return getUserPermissions(
+          this.$attributes[this.$primaryKeyValue || "id"],
+          this.$trx
+        );
+      }
     }
 
-    public async can(slug: string): Promise<boolean> {
-      return checkAccess(
-        this.$attributes[this.$primaryKeyValue || "id"],
-        slug,
-        this.$trx
-      );
-    }
-
-    public async getRoles(): Promise<string[]> {
-      return getUserRoles(
-        this.$attributes[this.$primaryKeyValue || "id"],
-        this.$trx
-      );
-    }
-    public async getPermissions(): Promise<string[]> {
-      return getUserPermissions(
-        this.$attributes[this.$primaryKeyValue || "id"],
-        this.$trx
-      );
-    }
-  }
-  return Mixin;
+    return Mixin;
+  };
 }
