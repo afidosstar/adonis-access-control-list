@@ -1,6 +1,6 @@
-import ControllerHelperProvider from "./providers/AccessControlListProvider";
+import AccessControlListProvider from "./providers/AccessControlListProvider";
 import AccessDeniedException from "./Exceptions/AccessDiniedException";
 
-export default ControllerHelperProvider;
+export default AccessControlListProvider;
 
 export { AccessDeniedException };
