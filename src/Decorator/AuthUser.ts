@@ -16,11 +16,11 @@ import {
   AclAuthDecorator,
   AuthUserFn,
 } from "@ioc:Adonis/Addons/AdonisAccessControlList";
-import {
-  GuardContract,
-  GuardsList,
-  ProvidersList,
-} from "@ioc:Adonis/Addons/Auth";
+// import {
+//   GuardContract,
+//   GuardsList,
+//   ProvidersList,
+// } from "@ioc:Adonis/Addons/Auth";
 
 export const authUser: AuthUserFn = function (
   options = { isUpdated: false }
@@ -33,17 +33,15 @@ export const authUser: AuthUserFn = function (
     Model.before(
       options.isUpdated ? "update" : "create",
       async function (entity) {
-        const { default: HttpContext } = await import(
-          "@ioc:Adonis/Core/HttpContext"
-        );
-        const ctx = HttpContext.get();
-        if (!ctx) {
-          return;
-        }
-        const auth = ctx.auth as GuardContract<
-          keyof ProvidersList,
-          keyof GuardsList
-        >;
+        const auth = this.container.use("Adonis/Addons/Auth");
+        // const ctx = HttpContext.get();
+        // if (!ctx) {
+        //   return;
+        // }
+        // const auth = ctx.auth as GuardContract<
+        //   keyof ProvidersList,
+        //   keyof GuardsList
+        // >;
         if (!auth) {
           return;
         }

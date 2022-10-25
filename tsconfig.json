@@ -11,6 +11,7 @@
       "@adonisjs/lucid",
       "@adonisjs/auth",
       "@adonisjs/view",
+      "@adonisjs/http-server",
     ]
   }
 }
