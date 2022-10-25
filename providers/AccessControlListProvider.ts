@@ -14,10 +14,13 @@ import {
   RouteContract,
   RouteJSON,
   RouteMiddlewareHandler,
-  RouteResourceContract
+  RouteResourceContract,
 } from "@ioc:Adonis/Core/Route";
 import { ApplicationContract } from "@ioc:Adonis/Core/Application";
-import { AccessRouteContract, ConfigAclContract } from "@ioc:Adonis/Addons/AdonisAccessControlList";
+import {
+  AccessRouteContract,
+  ConfigAclContract,
+} from "@ioc:Adonis/Addons/AdonisAccessControlList";
 import { join } from "path";
 import { LucidModel } from "@ioc:Adonis/Lucid/Orm";
 
