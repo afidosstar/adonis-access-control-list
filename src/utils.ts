@@ -84,6 +84,7 @@ export function getUserRoles(
   userId: number,
   trx?: TransactionClientContract
 ): Promise<Array<string>> {
+  console.log("getUserRoles", userId);
   const { userRole } = Config.get("acl.joinTables");
   return ((trx || Database) as QueryClientContract | TransactionClientContract)
     .query()

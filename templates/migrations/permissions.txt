@@ -17,8 +17,8 @@ export default class Permissions extends BaseSchema {
     this.schema.createTable(this.tableName, (table) => {
       table.increments("id");
       table.string("name", 255).notNullable().unique();
-      table.integer("created_by", 255);
-      table.integer("updated_by", 255);
+      table.string("slug", 255).notNullable().unique();
+      table.string("description", 255);
       /**
        * Uses timestamptz for PostgreSQL and DATETIME2 for MSSQL
        */

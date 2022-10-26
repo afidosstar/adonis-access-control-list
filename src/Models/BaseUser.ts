@@ -56,32 +56,19 @@ export function BaseUser<T extends NormalizeConstructor<LucidModel>>(
     public permissions: ManyToMany<typeof Permission>;
 
     public getAccesses(): Promise<string[]> {
-      return getUserAccessSlug(
-        this.$attributes[this.$primaryKeyValue || "id"],
-        this.$trx
-      );
+      return getUserAccessSlug(this.$primaryKeyValue as number, this.$trx);
     }
 
     public async can(slug: string): Promise<boolean> {
-      return checkAccess(
-        this.$attributes[this.$primaryKeyValue || "id"],
-        slug,
-        this.$trx
-      );
+      return checkAccess(this.$primaryKeyValue as number, slug, this.$trx);
     }
 
     public async getRoles(): Promise<string[]> {
-      return getUserRoles(
-        this.$attributes[this.$primaryKeyValue || "id"],
-        this.$trx
-      );
+      return getUserRoles(this.$primaryKeyValue as number, this.$trx);
     }
 
     public async getPermissions(): Promise<string[]> {
-      return getUserPermissions(
-        this.$attributes[this.$primaryKeyValue || "id"],
-        this.$trx
-      );
+      return getUserPermissions(this.$primaryKeyValue as number, this.$trx);
     }
   }
 
