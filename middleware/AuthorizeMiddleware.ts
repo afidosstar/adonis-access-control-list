@@ -30,7 +30,7 @@ export default class AuthorizeMiddleware {
       throw new AuthNotConfiguredException();
     }
 
-    const user = (await auth.authenticate()) as AclAuthUser<any, any>;
+    const user = (await auth.authenticate()) as AclAuthUser;
     if (await user.can(allowedAccesses[0])) {
       return next();
     }

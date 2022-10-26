@@ -9,7 +9,12 @@
  *
  */
 
-import { LucidModel, ManyToMany, manyToMany } from "@ioc:Adonis/Lucid/Orm";
+import {
+  column,
+  LucidModel,
+  ManyToMany,
+  manyToMany,
+} from "@ioc:Adonis/Lucid/Orm";
 import { NormalizeConstructor } from "@poppinss/utils/build/src/Helpers";
 import Config from "@ioc:Adonis/Core/Config";
 import {
@@ -32,8 +37,11 @@ export function BaseUser<T extends NormalizeConstructor<LucidModel>>(
   superclass: T
 ) {
   class Mixin extends superclass {
+    @column({ isPrimary: true })
+    public id: number;
     @manyToMany(() => Role, {
       pivotTable: userRole,
+      relatedKey: "id",
       pivotForeignKey: "user_id",
       pivotRelatedForeignKey: "role_id",
     })
@@ -41,6 +49,7 @@ export function BaseUser<T extends NormalizeConstructor<LucidModel>>(
 
     @manyToMany(() => Permission, {
       pivotTable: permissionUser,
+      relatedKey: "id",
       pivotForeignKey: "user_id",
       pivotRelatedForeignKey: "permission_id",
     })
