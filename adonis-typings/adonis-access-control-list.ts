@@ -96,7 +96,7 @@ declare module "@ioc:Adonis/Addons/Acl" {
 
   export type AclAuthDecorator = (target: LucidRow, property: string) => void;
 
-  export type AclAuthUser = {
+  export type AclAuthUser = LucidRow & {
     roles: ManyToMany<RoleModelType>;
     permissions: ManyToMany<PermissionModelType>;
     getAccesses(): Promise<string[]>;
