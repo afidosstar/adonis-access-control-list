@@ -20,7 +20,7 @@ import { ApplicationContract } from "@ioc:Adonis/Core/Application";
 import { AccessRouteContract, ConfigAclContract } from "@ioc:Adonis/Addons/Acl";
 import { join } from "path";
 import { LucidModel } from "@ioc:Adonis/Lucid/Orm";
-import { authUser } from "../src/Decorator/AuthUser";
+import authUserBuilder from "../src/Decorator/AuthUser";
 
 export default class AccessControlProvider {
   public static needsApplication: boolean = true;
@@ -51,7 +51,7 @@ export default class AccessControlProvider {
     this.app.container.singleton("Adonis/Addons/Acl", () => {
       const { BaseUser } = require("../src/Models/BaseUser");
       return {
-        authUser,
+        authUser: authUserBuilder(this.app.container),
         BaseUser,
       };
     });

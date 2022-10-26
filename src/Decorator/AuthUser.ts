@@ -13,41 +13,32 @@
 import "reflect-metadata";
 import { LucidModel } from "@ioc:Adonis/Lucid/Orm";
 import { AclAuthDecorator, AuthUserFn } from "@ioc:Adonis/Addons/Acl";
-// import {
-//   GuardContract,
-//   GuardsList,
-//   ProvidersList,
-// } from "@ioc:Adonis/Addons/Auth";
+import { IocContract } from "@adonisjs/fold";
 
-export const authUser: AuthUserFn = function (
-  options = { isUpdated: false }
-): AclAuthDecorator {
-  return function (target, property) {
-    const Model = target.constructor as LucidModel;
-    options = Object.assign({ isUpdated: false }, options || {});
-    Model.boot();
-    Model.$addColumn(property, options);
-    Model.before(
-      options.isUpdated ? "update" : "create",
-      async function (entity) {
-        const auth = this.container.use("Adonis/Addons/Auth");
-        // const ctx = HttpContext.get();
-        // if (!ctx) {
-        //   return;
-        // }
-        // const auth = ctx.auth as GuardContract<
-        //   keyof ProvidersList,
-        //   keyof GuardsList
-        // >;
-        if (!auth) {
-          return;
+export default function authUserBuilder(container: IocContract): AuthUserFn {
+  return function (options = { isUpdated: false }): AclAuthDecorator {
+    return function (target, property) {
+      const Model = target.constructor as LucidModel;
+      options = Object.assign({ isUpdated: false }, options || {});
+      Model.boot();
+      Model.$addColumn(property, options);
+      Model.before(
+        options.isUpdated ? "update" : "create",
+        async function (entity) {
+          if (container.hasBinding("Adonis/Core/HttpContext")) {
+            const HttpContext = container.use("Adonis/Core/HttpContext");
+            const auth = HttpContext.get()?.auth;
+            if (!auth) {
+              return;
+            }
+            const user: any = await auth.authenticate().catch(() => null);
+            if (!user) {
+              return;
+            }
+            entity[property] = user.id;
+          }
         }
-        const user: any = await auth.authenticate();
-        if (!user) {
-          return;
-        }
-        entity[property] = user.id;
-      }
-    );
+      );
+    };
   };
-};
+}
