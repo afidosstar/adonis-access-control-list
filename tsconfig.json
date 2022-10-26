@@ -10,7 +10,13 @@
       "@adonisjs/core",
       "@adonisjs/lucid",
       "@adonisjs/auth",
-      "@adonisjs/view",
+      "@adonisjs/view"
+    ],
+    "plugins": [
+      {
+        "transform": "./ioc-transformer.js",
+        "after": true
+      }
     ]
   }
 }

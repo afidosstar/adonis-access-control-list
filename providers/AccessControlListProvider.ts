@@ -49,10 +49,10 @@ export default class AccessControlProvider {
   }
   private registerOther() {
     this.app.container.singleton("Adonis/Addons/Acl", () => {
-      //const { BaseUser } = require("../src/Models/BaseUser");
+      const { BaseUser } = require("../src/Models/BaseUser");
       return {
         authUser,
-        BaseUser: (x) => x,
+        BaseUser,
       };
     });
     this.app.container.singleton(
