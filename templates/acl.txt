@@ -8,7 +8,7 @@
  *  file that was distributed with this source code.
  *
  */
-import { ConfigAclContract } from "@ioc:Adonis/Addons/AdonisAccessControlList";
+import { ConfigAclContract } from "@ioc:Adonis/Addons/Acl";
 
 const configAcl: ConfigAclContract = {
   prefix: "acl",

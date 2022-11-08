@@ -71,7 +71,11 @@ export default class AclStoreAccess extends BaseCommand {
       const permits = await trx
         .table("accesses")
         .knexQuery.insert(authorizedDescriptors)
-        .onConflict(["route", "slug", "name"])
+        .onConflict(["route"])
+        .merge()
+        .onConflict(["slug"])
+        .merge()
+        .onConflict(["name"])
         .merge()
         .returning("id");
 
