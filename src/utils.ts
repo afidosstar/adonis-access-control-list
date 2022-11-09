@@ -31,11 +31,6 @@ function buildQuery(
       `${permissionAccess}.permission_id`,
       "permissions.id"
     )
-    .leftJoin(
-      "permissions",
-      `${permissionAccess}.permission_id`,
-      "permissions.id"
-    )
 
     .leftJoin(
       permissionUser,
@@ -47,8 +42,8 @@ function buildQuery(
       `${permissionRole}.permission_id`,
       "permissions.id"
     )
-    .leftJoin("roles", `${permissionRole}.roles_id`, "roles.id")
-    .leftJoin(`${userRole}`, `${userRole}.roles_id`, "roles.id");
+    .leftJoin("roles", `${permissionRole}.role_id`, "roles.id")
+    .leftJoin(`${userRole}`, `${userRole}.role_id`, "roles.id");
 }
 
 export async function getUserAccessSlug(

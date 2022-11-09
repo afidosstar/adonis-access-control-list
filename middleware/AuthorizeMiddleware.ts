@@ -10,33 +10,34 @@
  */
 
 import { HttpContextContract } from "@ioc:Adonis/Core/HttpContext";
-import _ from "lodash";
 import AccessDeniedException from "../Exceptions/AccessDiniedException";
 import { AclAuthUser } from "@ioc:Adonis/Addons/Acl";
 import AuthNotConfiguredException from "../Exceptions/AuthNotConfiguredException";
+import get from "lodash/get";
 
 export default class AuthorizeMiddleware {
   public async handle(
     { auth, route }: HttpContextContract,
-    next: () => Promise<void>,
-    allowedAccesses: string[]
+    next: () => Promise<void>
   ) {
-    // code for middleware goes here. ABOVE THE NEXT CALL
-    if (!_.has(route, "meta.authorizeRoute")) {
-      return next();
-    }
-
     if (!auth) {
       throw new AuthNotConfiguredException();
     }
+    const slug = get(route, "meta.authorizeRoute.name");
+    // code for middleware goes here. ABOVE THE NEXT CALL
+    if (!slug) {
+      return next();
+    }
 
     const user = (await auth.authenticate()) as AclAuthUser;
-    if (await user.can(allowedAccesses[0])) {
+    if (await user.can(slug)) {
       return next();
     }
 
     throw new AccessDeniedException(
-      "You are not authorized to access this resource"
+      "You are not authorized to access this resource",
+      403,
+      "E_ACCESS_DENIED"
     );
   }
 }
