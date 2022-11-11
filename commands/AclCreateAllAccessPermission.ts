@@ -39,7 +39,9 @@ export default class AclCreateAllAccessPermission extends BaseCommand {
   public description: string = "Create/update permission and assign all access";
 
   public async run() {
-    const Access = this.application.container.use("Adonis/Addons/Acl/Access");
+    const Access = this.application.container.use(
+      "Adonis/Addons/Acl/Models/Access"
+    );
     const Permission = this.application.container.use(
       "Adonis/Addons/Acl/Permission"
     );
