@@ -29,12 +29,17 @@ export default class AclCreateAllAccessPermission extends BaseCommand {
      */
     stayAlive: false,
   };
-  @flags.string({ name: "name", description: "Name of the permission" })
+  @flags.string({
+    name: "name",
+    description: "Name of the permission",
+    alias: "n",
+  })
   public name: string = "all";
 
   @flags.string({
     name: "description",
     description: "Describe of the permissions",
+    alias: "d",
   })
   public description: string = "Create/update permission and assign all access";
 
@@ -48,7 +53,7 @@ export default class AclCreateAllAccessPermission extends BaseCommand {
     // const Access = require("../src/Models/Access").default;
     // const Permission = require("../src/Models/Permission").default;
     const permission = await Permission.updateOrCreate(
-      { name: "all" },
+      { name: this.name },
       {
         name: this.name,
         slug: snakeCase(this.name),

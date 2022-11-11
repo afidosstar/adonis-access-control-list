@@ -114,7 +114,7 @@ export function getUserPermissions(
     .leftJoin("roles", `${permissionRole}.role_id`, "roles.id")
     .leftJoin(userRole, `${userRole}.role_id`, "roles.id")
     .where(`${userRole}.user_id`, userId)
-    .where(`${permissionUser}.user_id`, userId)
+    .orWhere(`${permissionUser}.user_id`, userId)
     .then((res) => {
       return res.map((r) => r.slug);
     });
