@@ -43,7 +43,7 @@ export default class AclCreateAllAccessPermission extends BaseCommand {
       "Adonis/Addons/Acl/Models/Access"
     );
     const Permission = this.application.container.use(
-      "Adonis/Addons/Acl/Permission"
+      "Adonis/Addons/Acl/Models/Permission"
     );
     // const Access = require("../src/Models/Access").default;
     // const Permission = require("../src/Models/Permission").default;
