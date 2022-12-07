@@ -68,6 +68,10 @@ export default class AclStoreAccess extends BaseCommand {
       }
     });
     await Database.transaction(async (trx) => {
+      await trx.from("accesses").whereNotIn(
+        "slug",
+        authorizedDescriptors.map(({ slug }) => slug)
+      );
       const permits = await trx
         .table("accesses")
         .knexQuery.insert(authorizedDescriptors)
