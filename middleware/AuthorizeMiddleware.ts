@@ -30,7 +30,7 @@ export default class AuthorizeMiddleware {
     }
 
     const user = (await auth.authenticate()) as AclAuthUser;
-    if (await user.can(slug)) {
+    if (user && (await user.can(slug))) {
       return next();
     }
 
