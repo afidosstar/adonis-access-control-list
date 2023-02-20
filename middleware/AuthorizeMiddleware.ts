@@ -14,6 +14,7 @@ import AccessDeniedException from "../Exceptions/AccessDiniedException";
 import { AclAuthUser } from "@ioc:Adonis/Addons/Acl";
 import AuthNotConfiguredException from "../Exceptions/AuthNotConfiguredException";
 import get from "lodash/get";
+import UnauthorizedException from "../Exceptions/UnauthorizedException";
 
 export default class AuthorizeMiddleware {
   public async handle(
@@ -30,14 +31,15 @@ export default class AuthorizeMiddleware {
     }
 
     const user = (await auth.authenticate()) as AclAuthUser;
-    if (user && (await user.can(slug))) {
+    if (!user) {
+      throw new UnauthorizedException("User not authorized");
+    }
+    if (await user.can(slug)) {
       return next();
     }
 
     throw new AccessDeniedException(
-      "You are not authorized to access this resource",
-      403,
-      "E_ACCESS_DENIED"
+      "You are not authorized to access this resource"
     );
   }
 }
