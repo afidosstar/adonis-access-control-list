@@ -12,11 +12,7 @@
 import { Exception } from "@poppinss/utils";
 
 export default class AccessDeniedException extends Exception {
-  public static invoke(
-    message: string,
-    status: number = 403,
-    code: string = "E_ACCESS_DENIED"
-  ) {
-    return new this(message, status, code);
+  constructor(message: string) {
+    super(message, 403, "E_ACCESS_DENIED");
   }
 }

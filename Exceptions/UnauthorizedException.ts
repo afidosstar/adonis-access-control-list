@@ -12,11 +12,7 @@
 import { Exception } from "@poppinss/utils";
 
 export default class UnauthorizedException extends Exception {
-  public static invoke(
-    message: string,
-    status: number = 401,
-    code: string = "E_UNAUTHORIZED"
-  ) {
-    return new this(message, status, code);
+  constructor(message: string) {
+    super(message, 401, "E_UNAUTHORIZED");
   }
 }
