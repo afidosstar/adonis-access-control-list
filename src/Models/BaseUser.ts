@@ -10,7 +10,6 @@
  */
 
 import {
-  BaseModel,
   column, LucidModel,
   ManyToMany,
   manyToMany
