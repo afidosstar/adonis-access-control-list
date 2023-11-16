@@ -6,7 +6,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 declare module "@ioc:Adonis/Addons/Acl/Models/Access" {
   import { LucidModel, LucidRow } from "@ioc:Adonis/Lucid/Orm";
   import { DateTime } from "luxon";
@@ -96,18 +95,6 @@ declare module "@ioc:Adonis/Addons/Acl" {
 
   export type AclAuthDecorator = (target: LucidRow, property: string) => void;
 
-  export type AclAuthUser = LucidRow & {
-    roles: ManyToMany<RoleModelType>;
-    permissions: ManyToMany<PermissionModelType>;
-    getAccesses(): Promise<string[]>;
-
-    can(slug: string): Promise<boolean>;
-
-    getRoles(): Promise<string[]>;
-
-    getPermissions(): Promise<string[]>;
-  };
-
   interface AuthUserFn {
     (
       options?: Partial<ColumnOptions & { isUpdated?: boolean }>
@@ -116,7 +103,17 @@ declare module "@ioc:Adonis/Addons/Acl" {
   type ExtendUser = <T extends NormalizeConstructor<LucidModel>>(
     superclass: T
   ) => T & {
-    new (...args: any[]): AclAuthUser;
+    new (...args: any[]): {
+      roles: ManyToMany<RoleModelType>;
+      permissions: ManyToMany<PermissionModelType>;
+      getAccesses(): Promise<string[]>;
+
+      can(slug: string): Promise<boolean>;
+
+      getRoles(): Promise<string[]>;
+
+      getPermissions(): Promise<string[]>;
+    };
   };
 
   export const authUser: AuthUserFn;

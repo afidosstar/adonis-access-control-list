@@ -10,9 +10,10 @@
  */
 
 import {
-  column, LucidModel,
+  column,
+  LucidModel,
   ManyToMany,
-  manyToMany
+  manyToMany,
 } from "@ioc:Adonis/Lucid/Orm";
 import { NormalizeConstructor } from "@poppinss/utils/build/src/Helpers";
 import Config from "@ioc:Adonis/Core/Config";
