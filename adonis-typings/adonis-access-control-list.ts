@@ -95,6 +95,17 @@ declare module "@ioc:Adonis/Addons/Acl" {
 
   export type AclAuthDecorator = (target: LucidRow, property: string) => void;
 
+  export type AclAuthUser = {
+    roles: ManyToMany<RoleModelType>;
+    permissions: ManyToMany<PermissionModelType>;
+    getAccesses(): Promise<string[]>;
+
+    can(slug: string): Promise<boolean>;
+
+    getRoles(): Promise<string[]>;
+
+    getPermissions(): Promise<string[]>;
+  }
   interface AuthUserFn {
     (
       options?: Partial<ColumnOptions & { isUpdated?: boolean }>
@@ -103,17 +114,7 @@ declare module "@ioc:Adonis/Addons/Acl" {
   type ExtendUser = <T extends NormalizeConstructor<LucidModel>>(
     superclass: T
   ) => T & {
-    new (...args: any[]): {
-      roles: ManyToMany<RoleModelType>;
-      permissions: ManyToMany<PermissionModelType>;
-      getAccesses(): Promise<string[]>;
-
-      can(slug: string): Promise<boolean>;
-
-      getRoles(): Promise<string[]>;
-
-      getPermissions(): Promise<string[]>;
-    };
+    new (...args: any[]): AclAuthUser;
   };
 
   export const authUser: AuthUserFn;
