@@ -42,17 +42,11 @@ export default class AclSetup extends BaseCommand {
     const tasksManager = this.ui.tasks();
     tasksManager.add("Make migration", async (_logger, task) => {
       const index = Date.now();
-      this.addMigration("accesses", index)
-        .addMigration("roles", index + 1)
-        .addMigration("permissions", index + 2)
-        .addMigration(
-          "permissions_accesses",
-          index + 3,
-          joinTables.permissionAccess
-        )
-        .addMigration("permissions_roles", index + 4, joinTables.permissionRole)
-        .addMigration("permissions_users", index + 5, joinTables.permissionUser)
-        .addMigration("users_roles", index + 6, joinTables.userRole);
+      this.addMigration("roles", index)
+        .addMigration("permissions", index + 1)
+        .addMigration("permissions_roles", index + 2, joinTables.permissionRole)
+        .addMigration("permissions_users", index + 3, joinTables.permissionUser)
+        .addMigration("users_roles", index + 4, joinTables.userRole);
       await this.generator.run();
       await task.complete();
     });
@@ -63,7 +57,7 @@ export default class AclSetup extends BaseCommand {
     const data = fsReadAll(
       join(this.application.appRoot, "database/migrations")
     );
-    return data.some((val) => /accesses/.test(val));
+    return data.some((val) => /permissions/.test(val));
   }
 
   private addMigration(name: string, index: number, tableName?: string): this {

@@ -14,7 +14,6 @@ function resolve(path) {
 }
 
 export default [
-  resolve("AclCreateAllAccessPermission"),
   resolve("AclSetup"),
   resolve("AclStoreAccess"),
 ];

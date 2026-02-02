@@ -6,40 +6,25 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-declare module "@ioc:Adonis/Addons/Acl/Models/Access" {
+declare module "@ioc:Adonis/Addons/Acl/Models/Permission" {
   import { LucidModel, LucidRow } from "@ioc:Adonis/Lucid/Orm";
   import { DateTime } from "luxon";
-  export type AccessModelType = LucidModel & {
-    new (...args: any[]): LucidRow & {
-      id: number;
-      name: string;
-      group: string;
-      route: string;
-      slug: string;
-      description?: string;
-      createdAt: DateTime;
-      updatedAt: DateTime;
-    };
-  };
-  const Access: AccessModelType;
-  export default Access;
-}
 
-declare module "@ioc:Adonis/Addons/Acl/Models/Permission" {
-  import { LucidModel, LucidRow, ManyToMany } from "@ioc:Adonis/Lucid/Orm";
-  import { DateTime } from "luxon";
-  import { AccessModelType } from "@ioc:Adonis/Addons/Acl/Models/Access";
+  export interface PermissionInterface {
+    id: number;
+    name: string;
+    slug: string;
+    description: string;
+    route: string;
+    group: string;
+    createdAt: DateTime;
+    updatedAt: DateTime;
+  }
+
   export type PermissionModelType = LucidModel & {
-    new (...args: any[]): LucidRow & {
-      id: number;
-      name: string;
-      slug: string;
-      description: string;
-      accesses: ManyToMany<AccessModelType>;
-      createdAt: DateTime;
-      updatedAt: DateTime;
-    };
-  };
+    new (...args: any[]): LucidRow & PermissionInterface;
+  }
+
   const Permission: PermissionModelType;
   export default Permission;
 }
@@ -48,18 +33,23 @@ declare module "@ioc:Adonis/Addons/Acl/Models/Role" {
   import { LucidModel, LucidRow, ManyToMany } from "@ioc:Adonis/Lucid/Orm";
   import { PermissionModelType } from "@ioc:Adonis/Addons/Acl/Models/Permission";
   import { DateTime } from "luxon";
+
+  export interface RoleInterface{
+    id: number;
+    name: string;
+    slug: string;
+    description: string;
+    permissions: ManyToMany<PermissionModelType>;
+    createdAt: DateTime;
+    updatedAt: DateTime;
+  }
+
   export type RoleModelType = LucidModel & {
-    new (...args: any[]): LucidRow & {
-      id: number;
-      name: string;
-      slug: string;
-      description: string;
-      permissions: ManyToMany<PermissionModelType>;
-      createdAt: DateTime;
-      updatedAt: DateTime;
-    };
+    new (...args: any[]): LucidRow & RoleInterface;
   };
+
   const Role: RoleModelType;
+
   export default Role;
 }
 
@@ -85,7 +75,6 @@ declare module "@ioc:Adonis/Addons/Acl" {
     prefix: string | undefined;
     middlewares?: RouteMiddlewareHandler | RouteMiddlewareHandler[];
     joinTables: {
-      permissionAccess: string;
       permissionRole: string;
       permissionUser: string;
       userRole: string;
@@ -105,7 +94,7 @@ declare module "@ioc:Adonis/Addons/Acl" {
     getRoles(): Promise<string[]>;
 
     getPermissions(): Promise<string[]>;
-  }
+  };
   interface AuthUserFn {
     (
       options?: Partial<ColumnOptions & { isUpdated?: boolean }>

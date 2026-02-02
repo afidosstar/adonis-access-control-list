@@ -19,19 +19,12 @@ import Config from "@ioc:Adonis/Core/Config";
 function buildQuery(
   trx?: TransactionClientContract
 ): DatabaseQueryBuilderContract<any> {
-  const { permissionAccess, permissionRole, permissionUser, userRole } =
+  const { permissionRole, permissionUser, userRole } =
     Config.get("acl.joinTables");
   return ((trx || Database) as QueryClientContract | TransactionClientContract)
     .query()
-    .from("accesses")
-    .distinct("accesses.slug")
-    .leftJoin(permissionAccess, `${permissionAccess}.access_id`, "accesses.id")
-    .leftJoin(
-      "permissions",
-      `${permissionAccess}.permission_id`,
-      "permissions.id"
-    )
-
+    .from("permissions")
+    .distinct("permissions.slug")
     .leftJoin(
       permissionUser,
       `${permissionUser}.permission_id`,
@@ -52,8 +45,10 @@ export async function getUserAccessSlug(
 ): Promise<Array<string>> {
   const { permissionUser, userRole } = Config.get("acl.joinTables");
   return buildQuery(trx)
-    .where(`${permissionUser}.user_id`, userId)
-    .orWhere(`${userRole}.user_id`, userId)
+    .where((qb) => {
+      qb.where(`${permissionUser}.user_id`, userId)
+        .orWhere(`${userRole}.user_id`, userId)
+    })
     .then((res) => {
       return res.map((r) => r.slug);
     });
@@ -71,7 +66,7 @@ export function checkAccess(
         .where(`${permissionUser}.user_id`, userId)
         .orWhere(`${userRole}.user_id`, userId)
     )
-    .where("accesses.slug", slug)
+    .where("permissions.slug", slug)
     .then((res) => res.length > 0);
 }
 
@@ -113,8 +108,10 @@ export function getUserPermissions(
     )
     .leftJoin("roles", `${permissionRole}.role_id`, "roles.id")
     .leftJoin(userRole, `${userRole}.role_id`, "roles.id")
-    .where(`${userRole}.user_id`, userId)
-    .orWhere(`${permissionUser}.user_id`, userId)
+    .where((qb) => {
+      qb.where(`${userRole}.user_id`, userId)
+        .orWhere(`${permissionUser}.user_id`, userId)
+    })
     .then((res) => {
       return res.map((r) => r.slug);
     });

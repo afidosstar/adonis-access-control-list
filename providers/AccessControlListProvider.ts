@@ -28,9 +28,6 @@ export default class AccessControlProvider {
   constructor(protected app: ApplicationContract) {}
 
   private registerModel() {
-    this.app.container.bind("Adonis/Addons/Acl/Models/Access", () => {
-      return this.bootModel(require("../src/Models/Access"));
-    });
     this.app.container.bind("Adonis/Addons/Acl/Models/Role", () => {
       return this.bootModel(require("../src/Models/Role"));
     });
@@ -185,11 +182,6 @@ export default class AccessControlProvider {
       Route.delete("permissions/:id", "PermissionController.destroy").as(
         "acl.permissions.destroy"
       );
-
-      Route.post(
-        "permissions/:id/accesses/sync",
-        "PermissionController.sync"
-      ).as("acl.permissions.accesses.sync");
     }).namespace("Adonis/Addons/Acl/Controllers");
     // Add middleware to route group
     if (configACL.middlewares) {

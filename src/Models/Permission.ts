@@ -13,14 +13,11 @@ import { DateTime } from "luxon";
 import {
   BaseModel,
   column,
-  manyToMany,
-  ManyToMany,
 } from "@ioc:Adonis/Lucid/Orm";
-import Access from "./Access";
-import Config from "@ioc:Adonis/Core/Config";
-const { permissionAccess } = Config.get("acl.joinTables");
+import { compose } from "@poppinss/utils/build/src/Helpers";
+import { SoftDeletes } from "adonis-lucid-soft-deletes";
 
-export default class Permission extends BaseModel {
+export default class Permission extends compose(BaseModel, SoftDeletes) {
   @column({ isPrimary: true })
   public id: number;
 
@@ -30,16 +27,16 @@ export default class Permission extends BaseModel {
 
   @column() public description: string;
 
-  @manyToMany(() => Access, {
-    pivotTable: permissionAccess,
-    pivotForeignKey: "permission_id",
-    pivotRelatedForeignKey: "access_id",
-  })
-  public accesses: ManyToMany<typeof Access>;
+  @column() public route: string;
+
+  @column() public group: string;
 
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime;
 
   @column.dateTime({ autoUpdate: true })
   public updatedAt: DateTime;
+
+  @column.dateTime()
+  public deletedAt?: DateTime;
 }

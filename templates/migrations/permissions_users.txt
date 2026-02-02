@@ -31,6 +31,12 @@ export default class PermissionsUsers extends BaseSchema {
       table.unique(["permission_id", "user_id"]);
 
       /**
+       * Indexes for better performance
+       */
+      table.index(["user_id"], "permission_user_user_id_index");
+      table.index(["permission_id"], "permission_user_permission_id_index");
+
+      /**
        * Uses timestamptz for PostgreSQL and DATETIME2 for MSSQL
        */
       table.timestamp("created_at", { useTz: true });

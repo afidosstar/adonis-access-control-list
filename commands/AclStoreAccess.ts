@@ -13,7 +13,7 @@ export default class AclStoreAccess extends BaseCommand {
    * Command description is displayed in the "help" output
    */
   public static description =
-    "Update access in Db, based on route with method authorize";
+    "Update permissions in Db, based on route with method authorize";
 
   public static settings = {
     /**
@@ -69,14 +69,14 @@ export default class AclStoreAccess extends BaseCommand {
     });
     await Database.transaction(async (trx) => {
       await trx
-        .from("accesses")
+        .from("permissions")
         .whereNotIn(
           "slug",
           authorizedDescriptors.map(({ slug }) => slug)
         )
         .delete();
       const permits = await trx
-        .table("accesses")
+        .table("permissions")
         .knexQuery.insert(authorizedDescriptors)
         .onConflict(["route"])
         .merge()
@@ -86,28 +86,8 @@ export default class AclStoreAccess extends BaseCommand {
         .merge()
         .returning("id");
 
-      // const permits = await Promise.all(
-      //   authorizedDescriptors.map((access) => {
-      //     return Access.query({ client: trx })
-      //       .where(_.pick(access, "endpoint"))
-      //       .orWhere(_.pick(access, "code"))
-      //       .first()
-      //       .then((data) => {
-      //         if (data) {
-      //           data.merge(access);
-      //           return data
-      //             .useTransaction(trx)
-      //             .save()
-      //             .then(() => data);
-      //         }
-      //         return Access.create(access, { client: trx });
-      //       });
-      //   })
-      // );
-
       const ids = permits.map((p) => p.id);
-      await trx.from("accesses").whereNotIn("id", ids).delete();
-      // await Access.query({ client: trx }).where("id", "NOT IN", ids).delete();
+      await trx.from("permissions").whereNotIn("id", ids).delete();
     })
       .then(() => this.logger.success(`Save permission successfull`))
       .catch((error) => {

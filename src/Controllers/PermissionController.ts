@@ -31,11 +31,12 @@ export default class PermissionController {
         ]),
         description: schema.string.optional(),
         slug: schema.string(),
+        route: schema.string.optional(),
+        group: schema.string.optional(),
       }),
     });
     const result = await Database.transaction(async (trx) => {
       const permission = await Permission.create(data, { client: trx });
-      await permission.$getRelated("accesses");
       return permission;
     });
     return response
@@ -48,7 +49,6 @@ export default class PermissionController {
     if (!permission) {
       return response.notFound();
     }
-    await permission.$getRelated("accesses");
     return view.render("acl::permissions.update", { data: permission });
   }
 
@@ -64,6 +64,8 @@ export default class PermissionController {
         ]),
         description: schema.string.optional(),
         slug: schema.string(),
+        route: schema.string.optional(),
+        group: schema.string.optional(),
       }),
     });
     const result = await Database.transaction(async (trx) => {
@@ -92,15 +94,4 @@ export default class PermissionController {
     return response.redirect().toRoute("acl.permissions.index");
   }
 
-  public async sync({ request, response, params }: HttpContextContract) {
-    const permission = await Permission.find(params.id);
-    if (!permission) {
-      return response.notFound();
-    }
-    const bulks = request.input("bulks", []);
-    await permission.related("accesses").sync(bulks);
-    return response
-      .redirect()
-      .toRoute("acl.permissions.show", { id: permission.id });
-  }
 }

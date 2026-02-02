@@ -14,7 +14,6 @@ import AccessDeniedException from "../Exceptions/AccessDiniedException";
 import { AclAuthUser } from "@ioc:Adonis/Addons/Acl";
 import AuthNotConfiguredException from "../Exceptions/AuthNotConfiguredException";
 import get from "lodash/get";
-import UnauthorizedException from "../Exceptions/UnauthorizedException";
 
 export default class AuthorizeMiddleware {
   public async handle(
@@ -24,16 +23,18 @@ export default class AuthorizeMiddleware {
     if (!auth) {
       throw new AuthNotConfiguredException();
     }
+
     const slug = get(route, "meta.authorizeRoute.name");
-    // code for middleware goes here. ABOVE THE NEXT CALL
+
+    // Si pas de slug ACL, on passe sans vérification
     if (!slug) {
       return next();
     }
 
+    // auth.authenticate() lance déjà une exception si l'utilisateur n'est pas authentifié
+    // Pas besoin de vérifier if (!user)
     const user = (await auth.authenticate()) as AclAuthUser;
-    if (!user) {
-      throw new UnauthorizedException("User not authorized");
-    }
+
     if (await user.can(slug)) {
       return next();
     }

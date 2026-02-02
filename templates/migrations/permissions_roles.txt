@@ -29,6 +29,13 @@ export default class PermissionsRoles extends BaseSchema {
         .inTable("roles")
         .onDelete("CASCADE");
       table.unique(["permission_id", "role_id"]);
+
+      /**
+       * Indexes for better performance
+       */
+      table.index(["role_id"], "permission_role_role_id_index");
+      table.index(["permission_id"], "permission_role_permission_id_index");
+
       /**
        * Uses timestamptz for PostgreSQL and DATETIME2 for MSSQL
        */

@@ -39,6 +39,7 @@ export function BaseUser<T extends NormalizeConstructor<LucidModel>>(
   class Mixin extends superclass {
     @column({ isPrimary: true })
     public id: number;
+
     @manyToMany(() => Role, {
       pivotTable: userRole,
       relatedKey: "id",

@@ -15,7 +15,6 @@ const configAcl: ConfigAclContract = {
   // acl Middleware name
   middlewares: "auth:api",
   joinTables: {
-    permissionAccess: "permission_access",
     permissionRole: "permission_role",
     permissionUser: "permission_user",
     userRole: "user_role",
