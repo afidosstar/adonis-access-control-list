@@ -71,7 +71,7 @@
     "@adonisjs/http-server": "^5.11.0",
     "@adonisjs/lucid": "^18.2.0",
     "@adonisjs/view": "^6.2.0",
-    "adonis-lucid-soft-deletes": "^2.0.0"
+    "adonis-lucid-soft-deletes": "^1.4.4"
   },
   "mrmConfig": {
     "core": false,

@@ -35,7 +35,7 @@ npm i --save @fickou/adonis-access-control-list
 
 ## 2. Install Soft Delete Dependency
 ```bash
-npm i --save adonis-lucid-soft-deletes
+npm i --save adonis-lucid-soft-deletes@^1.4.4
 ```
 
 ## 3. Configure Provider
