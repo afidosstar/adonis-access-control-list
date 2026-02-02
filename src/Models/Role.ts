@@ -17,6 +17,7 @@ import {
   manyToMany,
 } from "@ioc:Adonis/Lucid/Orm";
 import { compose } from "@poppinss/utils/build/src/Helpers";
+// @ts-ignore
 import { SoftDeletes } from "adonis-lucid-soft-deletes";
 import Permission from "./Permission";
 import Config from "@ioc:Adonis/Core/Config";

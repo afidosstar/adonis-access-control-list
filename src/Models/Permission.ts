@@ -12,6 +12,7 @@
 import { DateTime } from "luxon";
 import { BaseModel, column } from "@ioc:Adonis/Lucid/Orm";
 import { compose } from "@poppinss/utils/build/src/Helpers";
+// @ts-ignore
 import { SoftDeletes } from "adonis-lucid-soft-deletes";
 
 export default class Permission extends compose(BaseModel, SoftDeletes) {

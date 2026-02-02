@@ -6,9 +6,14 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+/// <reference types="@adonisjs/lucid" />
+/// <reference types="@adonisjs/lucid" />
+
 declare module "@ioc:Adonis/Addons/Acl/Models/Permission" {
   import { LucidModel, LucidRow } from "@ioc:Adonis/Lucid/Orm";
   import { DateTime } from "luxon";
+  // @ts-ignore
+  import { SoftDeletes } from "adonis-lucid-soft-deletes";
 
   export interface PermissionInterface {
     id: number;
@@ -26,7 +31,7 @@ declare module "@ioc:Adonis/Addons/Acl/Models/Permission" {
     new (...args: any[]): LucidRow & PermissionInterface;
   };
 
-  const Permission: PermissionModelType & SoftDelete;
+  const Permission: PermissionModelType & SoftDeletes;
   export default Permission;
 }
 
@@ -34,6 +39,8 @@ declare module "@ioc:Adonis/Addons/Acl/Models/Role" {
   import { LucidModel, LucidRow, ManyToMany } from "@ioc:Adonis/Lucid/Orm";
   import { PermissionModelType } from "@ioc:Adonis/Addons/Acl/Models/Permission";
   import { DateTime } from "luxon";
+  // @ts-ignore
+  import { SoftDeletes } from "adonis-lucid-soft-deletes";
 
   export interface RoleInterface {
     id: number;
@@ -50,7 +57,7 @@ declare module "@ioc:Adonis/Addons/Acl/Models/Role" {
     new (...args: any[]): LucidRow & RoleInterface;
   };
 
-  const Role: RoleModelType;
+  const Role: RoleModelType & SoftDeletes;
 
   export default Role;
 }

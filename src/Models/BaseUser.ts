@@ -151,6 +151,7 @@ export function BaseUser<T extends NormalizeConstructor<LucidModel>>(
      */
     public async loadPermissions(): Promise<void> {
       await this.load((loader) => {
+        // @ts-ignore
         loader.load("roles").load("permissions");
       });
     }
