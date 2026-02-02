@@ -26,7 +26,7 @@ declare module "@ioc:Adonis/Addons/Acl/Models/Permission" {
     new (...args: any[]): LucidRow & PermissionInterface;
   };
 
-  const Permission: PermissionModelType;
+  const Permission: PermissionModelType & SoftDelete;
   export default Permission;
 }
 
