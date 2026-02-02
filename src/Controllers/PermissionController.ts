@@ -138,7 +138,9 @@ export default class PermissionController {
     }
 
     await permission.restore();
-    return response.redirect().toRoute("acl.permissions.show", { id: permission.id });
+    return response
+      .redirect()
+      .toRoute("acl.permissions.show", { id: permission.id });
   }
 
   /**
@@ -157,5 +159,4 @@ export default class PermissionController {
     await permission.forceDelete();
     return response.redirect().toRoute("acl.permissions.index");
   }
-
 }

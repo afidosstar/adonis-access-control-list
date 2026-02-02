@@ -24,7 +24,7 @@ declare module "@ioc:Adonis/Addons/Acl/Models/Permission" {
 
   export type PermissionModelType = LucidModel & {
     new (...args: any[]): LucidRow & PermissionInterface;
-  }
+  };
 
   const Permission: PermissionModelType;
   export default Permission;
@@ -35,7 +35,7 @@ declare module "@ioc:Adonis/Addons/Acl/Models/Role" {
   import { PermissionModelType } from "@ioc:Adonis/Addons/Acl/Models/Permission";
   import { DateTime } from "luxon";
 
-  export interface RoleInterface{
+  export interface RoleInterface {
     id: number;
     name: string;
     slug: string;

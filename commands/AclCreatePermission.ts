@@ -57,18 +57,15 @@ export default class AclCreatePermission extends BaseCommand {
         if (existing) {
           if (existing.deleted_at) {
             // Restaurer la permission
-            await trx
-              .from("permissions")
-              .where("id", existing.id)
-              .update({
-                slug: this.slug,
-                name: this.name,
-                description: this.description,
-                route: this.route,
-                group: this.group,
-                deleted_at: null,
-                updated_at: new Date(),
-              });
+            await trx.from("permissions").where("id", existing.id).update({
+              slug: this.slug,
+              name: this.name,
+              description: this.description,
+              route: this.route,
+              group: this.group,
+              deleted_at: null,
+              updated_at: new Date(),
+            });
 
             this.logger.success(
               `Permission "${this.name}" (${this.slug}) restaurée et mise à jour avec succès`

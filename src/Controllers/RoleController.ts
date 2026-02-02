@@ -164,7 +164,11 @@ export default class RoleController {
   /**
    * Assigne des permissions à un rôle
    */
-  public async assignPermissions({ request, response, params }: HttpContextContract) {
+  public async assignPermissions({
+    request,
+    response,
+    params,
+  }: HttpContextContract) {
     const data = await request.validate({
       schema: schema.create({
         permission_ids: schema.array().members(schema.number()),

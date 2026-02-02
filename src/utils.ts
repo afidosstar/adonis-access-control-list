@@ -46,8 +46,10 @@ export async function getUserAccessSlug(
   const { permissionUser, userRole } = Config.get("acl.joinTables");
   return buildQuery(trx)
     .where((qb) => {
-      qb.where(`${permissionUser}.user_id`, userId)
-        .orWhere(`${userRole}.user_id`, userId)
+      qb.where(`${permissionUser}.user_id`, userId).orWhere(
+        `${userRole}.user_id`,
+        userId
+      );
     })
     .then((res) => {
       return res.map((r) => r.slug);
@@ -97,7 +99,9 @@ export async function checkAccess(
     .then((res) => res.map((r) => r.slug));
 
   // Vérifie si une permission correspond (exact ou wildcard)
-  return userPermissions.some((permission) => matchesWildcard(permission, slug));
+  return userPermissions.some((permission) =>
+    matchesWildcard(permission, slug)
+  );
 }
 
 export function getUserRoles(
@@ -139,8 +143,10 @@ export function getUserPermissions(
     .leftJoin("roles", `${permissionRole}.role_id`, "roles.id")
     .leftJoin(userRole, `${userRole}.role_id`, "roles.id")
     .where((qb) => {
-      qb.where(`${userRole}.user_id`, userId)
-        .orWhere(`${permissionUser}.user_id`, userId)
+      qb.where(`${userRole}.user_id`, userId).orWhere(
+        `${permissionUser}.user_id`,
+        userId
+      );
     })
     .then((res) => {
       return res.map((r) => r.slug);

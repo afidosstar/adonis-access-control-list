@@ -51,16 +51,13 @@ export default class AclCreateRole extends BaseCommand {
         if (existing) {
           if (existing.deleted_at) {
             // Restaurer le rôle
-            await trx
-              .from("roles")
-              .where("id", existing.id)
-              .update({
-                slug: this.slug,
-                name: this.name,
-                description: this.description,
-                deleted_at: null,
-                updated_at: new Date(),
-              });
+            await trx.from("roles").where("id", existing.id).update({
+              slug: this.slug,
+              name: this.name,
+              description: this.description,
+              deleted_at: null,
+              updated_at: new Date(),
+            });
 
             this.logger.success(
               `Rôle "${this.name}" (${this.slug}) restauré et mis à jour avec succès`
@@ -85,9 +82,7 @@ export default class AclCreateRole extends BaseCommand {
         }
       });
     } catch (error) {
-      this.logger.error(
-        `Erreur lors de la création du rôle: ${error.message}`
-      );
+      this.logger.error(`Erreur lors de la création du rôle: ${error.message}`);
       process.exit(1);
     }
   }

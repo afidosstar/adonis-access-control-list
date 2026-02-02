@@ -10,10 +10,7 @@
  */
 
 import { DateTime } from "luxon";
-import {
-  BaseModel,
-  column,
-} from "@ioc:Adonis/Lucid/Orm";
+import { BaseModel, column } from "@ioc:Adonis/Lucid/Orm";
 import { compose } from "@poppinss/utils/build/src/Helpers";
 import { SoftDeletes } from "adonis-lucid-soft-deletes";
 
