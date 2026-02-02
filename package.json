@@ -1,6 +1,6 @@
 {
   "name": "@fickou/adonis-access-control-list",
-  "version": "1.1.3",
+  "version": "2.0.0",
   "description": "Help dev to filter database with query parameters ",
   "main": "build/index.js",
   "scripts": {
