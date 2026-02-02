@@ -1,8 +1,8 @@
 # adonis-access-control-list
-> Add Access Control List (acl) for Adonis JS 5+
+> Add Access Control List (ACL) for Adonis JS 5+
 
-[![typescript-image]][typescript-url] 
-[![npm-image]][npm-url] 
+[![typescript-image]][typescript-url]
+[![npm-image]][npm-url]
 [![license-image]][license-url]
 [![my-coffee-image]][my-coffee-url]
 
@@ -12,89 +12,115 @@
 ## Table of contents
 
 - [Installation](#installation)
-- [Sample Usage](#sample-usage)
-  
+- [Configuration](#configuration)
+- [Models Setup](#models-setup)
+- [Working With Roles](#working-with-roles)
+- [Working With Permissions](#working-with-permissions)
+- [User Helper Methods](#user-helper-methods)
+- [Wildcard Permissions](#wildcard-permissions)
+- [Super Admin Role](#super-admin-role)
+- [Soft Delete Support](#soft-delete-support)
+- [CLI Commands](#cli-commands)
+- [Protect Routes](#protect-routes)
+
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # Installation
-Run:
+
+## 1. Install Package
 ```bash
 npm i --save @fickou/adonis-access-control-list
 ```
 
-Install provider:
+## 2. Install Soft Delete Dependency
+```bash
+npm i --save adonis-lucid-soft-deletes
+```
+
+## 3. Configure Provider
 ```bash
 node ace configure @fickou/adonis-access-control-list
 ```
-Publish the package migrations to your application.
 
+## 4. Setup Migrations
 ```bash
-$ node ace acl:setup
+node ace acl:setup
 ```
-Apply all migration with `node ace migrations:run`
+
+## 5. Run Migrations
+```bash
+node ace migration:run
+```
 
 # Configuration
-## config
-Go to `config/acl.ts` and defined you own configuration:
+
+Allez dans `config/acl.ts` pour personnaliser votre configuration :
 
 ```ts
-import { ConfigAclContract } from "@ioc:Adonis/Addons/AdonisAccessControlList";
+import { ConfigAclContract } from "@ioc:Adonis/Addons/Acl";
 
 const configAcl: ConfigAclContract = {
+    /**
+     * Préfixe pour les routes ACL de gestion
+     */
     prefix: "acl",
-    middlewares: "auth:api",
+
+    /**
+     * Middlewares appliqués aux routes de gestion
+     * undefined = pas de middleware (à configurer par l'utilisateur)
+     */
+    middlewares: undefined,
+
+    /**
+     * Noms des tables de jointure
+     */
     joinTables: {
-        permissionAccess: "permission_access",
         permissionRole: "permission_role",
         permissionUser: "permission_user",
         userRole: "user_role",
     },
+
     /**
-     * `apiOnly` is used for auto configure view for assign access to permission
-     * by default it's false, if you want to use it, you need to set it to true
+     * Mode API uniquement (pas de routes web de gestion)
+     * Recommandé: true pour les applications API pures
      */
-    apiOnly: false,
+    apiOnly: true,
+
+    /**
+     * Slug du rôle super admin qui bypass toutes les permissions
+     */
+    superAdminRole: "super_admin",
 };
 
-export default configAcl
+export default configAcl;
 ```
 
-## Aliases
-Go to `.adonisrc.json` and add aliases:
+# Models Setup
 
-```ts
-{
-    "aliases": {
-    "Role": "Adonis/Addons/Acl/Role",
-    "Access": "Adonis/Addons/Acl/Access",
-    "Permission": "Adonis/Addons/Acl/Permission",
-  }
-}
-```
+## 1. Enregistrer le Middleware
 
-## Registering middleware
-
-Register the following middleware inside `start/kernel.ts` file.
+Dans `start/kernel.ts` :
 
 ```ts
 Server.middleware.register([
-    ...,
-    'Adonis/Addons/Acl/Authorize',
+    () => import('@ioc:Adonis/Core/BodyParser'),
+    () => import('App/Middleware/Auth'),
+    () => import('@ioc:Adonis/Addons/Acl/Authorize'), // ✅ Ajoutez cette ligne
 ])
 ```
 
-## Models
-Go to `App/Models/User.ts`, Compose user model with `BaseUser`:
+## 2. Configurer le Modèle User
+
+Dans `app/Models/User.ts`, composez votre modèle avec `BaseUser` :
 
 ```ts
-import {BaseModel, column} from '@ioc:Adonis/Lucid/Orm'
-import {compose} from "@poppinss/utils/build/src/Helpers";
-import BaseUser from "@ioc:Adonis/Addons/Acl/BaseUser";
-import authUser from "ioc:Adonis/Addons/Acl/Decorator/AuthUser";
+import { BaseModel, column } from '@ioc:Adonis/Lucid/Orm'
+import { compose } from '@poppinss/utils/build/src/Helpers'
+import BaseUser from '@ioc:Adonis/Addons/Acl/BaseUser'
 
 export default class User extends compose(BaseModel, BaseUser) {
-    @column({isPrimary: true})
+    @column({ isPrimary: true })
     public id: number
 
     @column()
@@ -103,209 +129,375 @@ export default class User extends compose(BaseModel, BaseUser) {
     @column()
     public email: string
 
-    @column()
+    @column({ serializeAs: null })
     public password: string
-
-    // @authUser()
-    // created_by: number;
-    
-    // @authUser({isUpdate: true})
-    // updated_by: number;
 }
 ```
 
-## Working With Roles
+# Working With Roles
 
-### Create Role
+## Créer un Rôle
 
-Lets create your first roles.
+### Via le modèle
+```ts
+import Role from '@ioc:Adonis/Addons/Acl/Models/Role'
 
-```js
 const roleAdmin = new Role()
 roleAdmin.name = 'Administrator'
-roleAdmin.slug = 'administrator'
-roleAdmin.description = 'manage administration privileges'
+roleAdmin.slug = 'admin'
+roleAdmin.description = 'Gestion des privilèges administrateur'
 await roleAdmin.save()
-
-const roleModerator = new Role()
-roleModerator.name = 'Moderator'
-roleModerator.slug = 'moderator'
-roleModerator.description = 'manage moderator privileges'
-await roleModerator.save()
 ```
 
-### Attach Role(s) To User
-```js
+### Via CLI
+```bash
+node ace acl:create:role admin Administrator --description="Administrateur système"
+```
+
+## Assigner un Rôle à un Utilisateur
+
+### Via les relations
+```ts
 const user = await User.find(1)
-await user.related('roles').attach([roleAdmin.id, roleModerator.id])
+await user.related('roles').attach([roleAdmin.id])
 ```
 
-### Detach Role(s) From User
+### Via CLI
+```bash
+node ace acl:assign:role admin 1
+```
 
-```js
+## Retirer un Rôle
+
+```ts
 const user = await User.find(1)
 await user.related('roles').detach([roleAdmin.id])
 ```
 
-### Get User Roles
+## Lister les Rôles
 
-Get roles assigned to a user.
-
-```js
-const user = await User.first()
-const roles = await user.getRoles() // ['administrator', 'moderator']
+```bash
+node ace acl:list:roles
 ```
 
-## Working With Permissions
-
-### Create Role Permissions
-
-```js
-const createUsersPermission = new Permission()
-createUsersPermission.slug = 'create_users'
-createUsersPermission.name = 'Create Users'
-createUsersPermission.description = 'create users permission'
-await createUsersPermission.save()
-
-const updateUsersPermission = new Permission()
-updateUsersPermission.slug = 'update_users'
-updateUsersPermission.name = 'Update Users'
-updateUsersPermission.description = 'update users permission'
-await updateUsersPermission.save()
-
-const deleteUsersPermission = new Permission()
-deleteUsersPermission.slug = 'delete_users'
-deleteUsersPermission.name = 'Delete Users'
-deleteUsersPermission.description = 'delete users permission'
-await deleteUsersPermission.save()
-
-const readUsersPermission = new Permission()
-readUsersPermission.slug = 'read_users'
-readUsersPermission.name = 'Read Users'
-readUsersPermission.description = 'read users permission'
-await readUsersPermission.save()
-```
-
-### Attach Permissions to Role
-
-```js
-const roleAdmin = await Role.find(1)
-await roleAdmin.related('permissions').attach([
-  createUsersPermission.id,
-  updateUsersPermission.id,
-  deleteUsersPermission.id,
-  readUsersPermission.id
-])
-```
-
-### Detach Permissions from Role
-
-```js
-const roleAdmin = await Role.find(1)
-await roleAdmin.related('permissions').detach([
-  createUsersPermission.id,
-  updateUsersPermission.id,
-  readUsersPermission.id
-])
-```
-
-### Get User Permissions
-
-Get permissions assigned to a role.
-```js
-const roleAdmin = await Role.find(1)
-// collection of permissions
-await roleAdmin.related('permissions').fetch()
-```
-
-## Working With Permissions
-
-### Create User Permissions
-
-```js
-const createUsersPermission = new Permission()
-createUsersPermission.slug = 'create_users'
-createUsersPermission.name = 'Create Users'
-createUsersPermission.description = 'create users permission'
-await createUsersPermission.save()
-
-const updateUsersPermission = new Permission()
-updateUsersPermission.slug = 'update_users'
-updateUsersPermission.name = 'Update Users'
-updateUsersPermission.description = 'update users permission'
-await updateUsersPermission.save()
-
-const deleteUsersPermission = new Permission()
-deleteUsersPermission.slug = 'delete_users'
-deleteUsersPermission.name = 'Delete Users'
-deleteUsersPermission.description = 'delete users permission'
-await deleteUsersPermission.save()
-
-const readUsersPermission = new Permission()
-readUsersPermission.slug = 'read_users'
-readUsersPermission.name = 'Read Users'
-readUsersPermission.description = 'read users permission'
-await readUsersPermission.save()
-```
-
-### Attach Permissions to User
-
-```js
-const user = await User.find(1)
-await user.related('permissions').attach([
-  createUsersPermission.id,
-  updateUsersPermission.id,
-  readUsersPermission.id
-])
-```
-
-### Detach Permissions from User
-
-```js
-const user = await User.find(1)
-await user.related('permissions').detach([
-  createUsersPermission.id,
-  updateUsersPermission.id,
-  readUsersPermission.id
-])
-```
-
-### Get User Accesses
-
-Get permissions assigned to a role.
-
-```js
-const user = await User.find(1)
-// ['create_users', 'update_users', 'delete_users', 'read_users']
-const accesses = await user.getAccesses()
-```
-
-
-# Protect Routes
- Protect routes with middleware
-## Routes
+## Récupérer les Rôles d'un Utilisateur
 
 ```ts
-import Route from '@ioc:Adonis/Core/Route';
+const user = await User.find(1)
+const roles = await user.getRoles() // ['admin', 'moderator']
+```
+
+# Working With Permissions
+
+## Créer une Permission
+
+### Via le modèle
+```ts
+import Permission from '@ioc:Adonis/Addons/Acl/Models/Permission'
+
+const createUsersPermission = new Permission()
+createUsersPermission.slug = 'users.create'
+createUsersPermission.name = 'Create Users'
+createUsersPermission.description = 'Créer des utilisateurs'
+createUsersPermission.group = 'users'
+createUsersPermission.route = 'POST /users'
+await createUsersPermission.save()
+```
+
+### Via CLI
+```bash
+node ace acl:create:permission users.create "Create Users" \
+  --description="Créer des utilisateurs" \
+  --group="users" \
+  --route="POST /users"
+```
+
+### Synchroniser depuis les Routes
+```bash
+node ace acl:store:access
+```
+Cette commande scanne toutes vos routes avec `.access()` et crée/met à jour automatiquement les permissions.
+
+## Assigner des Permissions à un Rôle
+
+### Via les relations
+```ts
+const roleAdmin = await Role.find(1)
+await roleAdmin.related('permissions').attach([permission.id])
+```
+
+### Via CLI
+```bash
+node ace acl:assign:permission users.create --role=admin
+```
+
+## Assigner des Permissions à un Utilisateur
+
+### Via les relations
+```ts
+const user = await User.find(1)
+await user.related('permissions').attach([permission.id])
+```
+
+### Via CLI
+```bash
+node ace acl:assign:permission users.create --user=1
+```
+
+## Lister les Permissions
+
+```bash
+# Toutes les permissions
+node ace acl:list:permissions
+
+# Filtrer par groupe
+node ace acl:list:permissions --group=users
+```
+
+## Récupérer les Permissions d'un Utilisateur
+
+```ts
+const user = await User.find(1)
+const permissions = await user.getAccesses()
+// ['users.create', 'users.update', 'users.delete', 'posts.*']
+```
+# User Helper Methods
+
+Le mixin `BaseUser` ajoute plusieurs méthodes utiles à votre modèle User :
+
+```ts
+const user = await User.find(1)
+
+// Vérifier un rôle
+await user.hasRole('admin') // true/false
+
+// Vérifier plusieurs rôles (au moins un)
+await user.hasAnyRole(['admin', 'moderator']) // true si l'un des rôles
+
+// Vérifier plusieurs rôles (tous requis)
+await user.hasAllRoles(['admin', 'moderator']) // true si tous les rôles
+
+// Vérifier une permission
+await user.hasPermission('users.create') // true/false
+
+// Vérifier plusieurs permissions (au moins une)
+await user.hasAnyPermission(['users.create', 'users.update'])
+
+// Vérifier plusieurs permissions (toutes requises)
+await user.hasAllPermissions(['users.create', 'users.update'])
+
+// Vérifier si super admin
+await user.isSuperAdmin() // true/false
+
+// Vérifier une permission (alias)
+await user.can('users.create') // true/false
+
+// Charger les permissions en cache
+await user.loadPermissions()
+```
+
+# Wildcard Permissions
+
+Les permissions supportent les patterns wildcard :
+
+```ts
+// Permission wildcard
+const permission = new Permission()
+permission.slug = 'users.*'
+permission.name = 'All User Permissions'
+await permission.save()
+
+// Assigner à un rôle
+const role = await Role.findBy('slug', 'admin')
+await role.related('permissions').attach([permission.id])
+
+// Maintenant l'utilisateur avec ce rôle a accès à :
+// ✅ users.create
+// ✅ users.update
+// ✅ users.delete
+// ✅ users.show
+// ❌ posts.create (différent préfixe)
+
+// Permission super wildcard
+permission.slug = '*' // Accès à TOUT
+```
+
+## Exemples de patterns :
+- `*` → Toutes les permissions
+- `users.*` → Toutes les permissions users (users.create, users.update, etc.)
+- `posts.*` → Toutes les permissions posts
+- `users.create` → Permission exacte uniquement
+
+# Super Admin Role
+
+Le rôle configuré comme `superAdminRole` dans la config bypass automatiquement toutes les vérifications de permissions.
+
+```ts
+// config/acl.ts
+superAdminRole: "super_admin"
+```
+
+```ts
+// Créer le rôle super admin
+const superAdmin = new Role()
+superAdmin.slug = 'super_admin'
+superAdmin.name = 'Super Administrator'
+await superAdmin.save()
+
+// Assigner à un utilisateur
+const user = await User.find(1)
+await user.related('roles').attach([superAdmin.id])
+
+// Cet utilisateur a maintenant accès à TOUT
+// sans avoir besoin d'assigner de permissions
+```
+
+# Soft Delete Support
+
+Les rôles et permissions utilisent le soft delete. Les enregistrements supprimés restent en base avec `deleted_at` non null.
+
+## Comportement automatique
+
+Si vous essayez de créer un rôle/permission qui existe déjà en soft-deleted :
+- ✅ L'ancien enregistrement est **automatiquement restauré et mis à jour**
+- ❌ Pas d'erreur de clé dupliquée
+
+```ts
+// 1. Créer une permission
+const perm = await Permission.create({ slug: 'users.create', name: 'Create' })
+
+// 2. La supprimer (soft delete)
+await perm.delete()
+
+// 3. La recréer → Restauration automatique !
+const newPerm = await Permission.create({ slug: 'users.create', name: 'Create Users' })
+// newPerm.id === perm.id (même enregistrement restauré)
+```
+
+## Gestion manuelle
+
+```ts
+// Afficher seulement les éléments supprimés
+const trashedPermissions = await Permission.query().onlyTrashed()
+
+// Restaurer
+const permission = await Permission.query()
+  .withTrashed()
+  .where('id', 1)
+  .first()
+await permission.restore()
+
+// Supprimer définitivement
+await permission.forceDelete()
+```
+
+# CLI Commands
+
+## Gestion des Rôles
+
+```bash
+# Créer un rôle
+node ace acl:create:role <slug> <name> [--description]
+
+# Exemples
+node ace acl:create:role admin Administrator
+node ace acl:create:role moderator Moderator --description="Modération du contenu"
+
+# Lister tous les rôles
+node ace acl:list:roles
+
+# Assigner un rôle à un utilisateur
+node ace acl:assign:role <role-slug> <user-id>
+node ace acl:assign:role admin 1
+```
+
+## Gestion des Permissions
+
+```bash
+# Créer une permission
+node ace acl:create:permission <slug> <name> [options]
+
+# Exemples
+node ace acl:create:permission users.create "Create Users"
+node ace acl:create:permission users.update "Update Users" \
+  --description="Modifier les utilisateurs" \
+  --group="users" \
+  --route="PUT /users/:id"
+
+# Lister toutes les permissions
+node ace acl:list:permissions
+
+# Lister par groupe
+node ace acl:list:permissions --group=users
+
+# Assigner une permission à un rôle
+node ace acl:assign:permission <permission-slug> --role=<role-slug>
+node ace acl:assign:permission users.create --role=admin
+
+# Assigner une permission à un utilisateur
+node ace acl:assign:permission <permission-slug> --user=<user-id>
+node ace acl:assign:permission users.create --user=1
+```
+
+## Synchronisation des Routes
+
+```bash
+# Synchroniser les permissions depuis les routes définies
+node ace acl:store:access
+```
+
+# Protect Routes
+
+Protégez vos routes avec le middleware et la méthode `.access()` :
+
+```ts
+import Route from '@ioc:Adonis/Core/Route'
 
 Route.group(() => {
+    // Définir les permissions pour chaque route
     Route.get('users', 'UsersController.index')
-        .access('list_user', 'List users');
+        .access('users.list', 'Liste des utilisateurs')
+
     Route.get('users/:id', 'UsersController.show')
-        .access('show_user', 'Show detail user');
+        .access('users.show', 'Détail utilisateur')
+
     Route.post('users', 'UsersController.store')
-        .access('show_user', 'Show detail user');
+        .access('users.create', 'Créer un utilisateur')
+
     Route.put('users/:id', 'UsersController.update')
-        .access('update_user', 'Update user');
+        .access('users.update', 'Modifier un utilisateur')
+
     Route.delete('users/:id', 'UsersController.destroy')
-        .access('destroy_user', 'Destroy user');
-    
-    //or
-    
-    Route.ressource('users', 'UsersController')
-        .access('user', 'User')
-        
-}).prefix('api/v1');
+        .access('users.delete', 'Supprimer un utilisateur')
+
+}).prefix('api/v1').middleware('auth')
+
+// Puis synchroniser
+// $ node ace acl:store:access
+```
+
+## Vérifications Manuelles
+
+```ts
+import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
+
+export default class UsersController {
+  public async index({ auth, response }: HttpContextContract) {
+    const user = auth.user!
+
+    // Vérifier une permission
+    if (!(await user.can('users.list'))) {
+      return response.forbidden({ message: 'Accès refusé' })
+    }
+
+    // Vérifier un rôle
+    if (!(await user.hasRole('admin'))) {
+      return response.forbidden({ message: 'Admin requis' })
+    }
+
+    // Votre logique
+  }
+}
 ```
 
 

@@ -26,19 +26,41 @@ export default class PermissionController {
   public async store({ request, response }: HttpContextContract) {
     const data = await request.validate({
       schema: schema.create({
-        name: schema.string({ trim: true }, [
-          rules.unique({ table: "permissions", column: "name" }),
-        ]),
+        name: schema.string({ trim: true }),
         description: schema.string.optional(),
         slug: schema.string(),
         route: schema.string.optional(),
         group: schema.string.optional(),
       }),
     });
+
     const result = await Database.transaction(async (trx) => {
+      // Vérifier si une permission soft-deleted existe déjà avec ce slug ou name
+      const existingPermission = await Permission.query({ client: trx })
+        .withTrashed()
+        .where((query) => {
+          query.where("slug", data.slug).orWhere("name", data.name);
+        })
+        .first();
+
+      if (existingPermission) {
+        if (existingPermission.deletedAt) {
+          // Restaurer et mettre à jour
+          await existingPermission.restore();
+          existingPermission.merge(data);
+          await existingPermission.save();
+          return existingPermission;
+        } else {
+          // Existe déjà et n'est pas supprimé
+          throw new Error("Une permission avec ce slug ou nom existe déjà");
+        }
+      }
+
+      // Créer une nouvelle permission
       const permission = await Permission.create(data, { client: trx });
       return permission;
     });
+
     return response
       .redirect()
       .toRoute("acl.permissions.show", { id: result.id });
@@ -90,7 +112,49 @@ export default class PermissionController {
     if (!permission) {
       return response.notFound();
     }
-    await permission.delete();
+    await permission.delete(); // Soft delete automatique grâce au package
+    return response.redirect().toRoute("acl.permissions.index");
+  }
+
+  /**
+   * Affiche les permissions supprimées (soft deleted)
+   */
+  public async trashed({ view }: HttpContextContract) {
+    const permissions = await Permission.query().onlyTrashed();
+    return view.render("acl::permissions.trashed", { data: permissions });
+  }
+
+  /**
+   * Restaure une permission supprimée
+   */
+  public async restore({ response, params }: HttpContextContract) {
+    const permission = await Permission.query()
+      .withTrashed()
+      .where("id", params.id)
+      .first();
+
+    if (!permission) {
+      return response.notFound();
+    }
+
+    await permission.restore();
+    return response.redirect().toRoute("acl.permissions.show", { id: permission.id });
+  }
+
+  /**
+   * Supprime définitivement une permission
+   */
+  public async forceDelete({ response, params }: HttpContextContract) {
+    const permission = await Permission.query()
+      .withTrashed()
+      .where("id", params.id)
+      .first();
+
+    if (!permission) {
+      return response.notFound();
+    }
+
+    await permission.forceDelete();
     return response.redirect().toRoute("acl.permissions.index");
   }
 

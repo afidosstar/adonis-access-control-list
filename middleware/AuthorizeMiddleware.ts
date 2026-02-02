@@ -13,6 +13,7 @@ import { HttpContextContract } from "@ioc:Adonis/Core/HttpContext";
 import AccessDeniedException from "../Exceptions/AccessDiniedException";
 import { AclAuthUser } from "@ioc:Adonis/Addons/Acl";
 import AuthNotConfiguredException from "../Exceptions/AuthNotConfiguredException";
+import Config from "@ioc:Adonis/Core/Config";
 import get from "lodash/get";
 
 export default class AuthorizeMiddleware {
@@ -34,6 +35,12 @@ export default class AuthorizeMiddleware {
     // auth.authenticate() lance déjà une exception si l'utilisateur n'est pas authentifié
     // Pas besoin de vérifier if (!user)
     const user = (await auth.authenticate()) as AclAuthUser;
+
+    // Vérifier si l'utilisateur est super admin
+    const superAdminRole = Config.get("acl.superAdminRole");
+    if (superAdminRole && (await user.isSuperAdmin())) {
+      return next();
+    }
 
     if (await user.can(slug)) {
       return next();

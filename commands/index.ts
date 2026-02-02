@@ -16,6 +16,12 @@ function resolve(path) {
 export default [
   resolve("AclSetup"),
   resolve("AclStoreAccess"),
+  resolve("AclCreateRole"),
+  resolve("AclCreatePermission"),
+  resolve("AclAssignRole"),
+  resolve("AclAssignPermission"),
+  resolve("AclListRoles"),
+  resolve("AclListPermissions"),
 ];
 
 //export default listDirectoryFiles(__dirname, Application, [

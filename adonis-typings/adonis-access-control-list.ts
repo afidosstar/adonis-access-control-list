@@ -19,6 +19,7 @@ declare module "@ioc:Adonis/Addons/Acl/Models/Permission" {
     group: string;
     createdAt: DateTime;
     updatedAt: DateTime;
+    deletedAt?: DateTime;
   }
 
   export type PermissionModelType = LucidModel & {
@@ -42,6 +43,7 @@ declare module "@ioc:Adonis/Addons/Acl/Models/Role" {
     permissions: ManyToMany<PermissionModelType>;
     createdAt: DateTime;
     updatedAt: DateTime;
+    deletedAt?: DateTime;
   }
 
   export type RoleModelType = LucidModel & {
@@ -72,7 +74,7 @@ declare module "@ioc:Adonis/Addons/Acl" {
   };
 
   export interface ConfigAclContract {
-    prefix: string | undefined;
+    prefix?: string;
     middlewares?: RouteMiddlewareHandler | RouteMiddlewareHandler[];
     joinTables: {
       permissionRole: string;
@@ -80,6 +82,7 @@ declare module "@ioc:Adonis/Addons/Acl" {
       userRole: string;
     };
     apiOnly: boolean;
+    superAdminRole?: string;
   }
 
   export type AclAuthDecorator = (target: LucidRow, property: string) => void;
@@ -87,13 +90,22 @@ declare module "@ioc:Adonis/Addons/Acl" {
   export type AclAuthUser = {
     roles: ManyToMany<RoleModelType>;
     permissions: ManyToMany<PermissionModelType>;
+
     getAccesses(): Promise<string[]>;
-
     can(slug: string): Promise<boolean>;
-
     getRoles(): Promise<string[]>;
-
     getPermissions(): Promise<string[]>;
+
+    hasRole(slug: string): Promise<boolean>;
+    hasAnyRole(slugs: string[]): Promise<boolean>;
+    hasAllRoles(slugs: string[]): Promise<boolean>;
+
+    hasPermission(slug: string): Promise<boolean>;
+    hasAnyPermission(slugs: string[]): Promise<boolean>;
+    hasAllPermissions(slugs: string[]): Promise<boolean>;
+
+    isSuperAdmin(): Promise<boolean>;
+    loadPermissions(): Promise<void>;
   };
   interface AuthUserFn {
     (

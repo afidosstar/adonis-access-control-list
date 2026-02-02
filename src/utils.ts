@@ -54,20 +54,50 @@ export async function getUserAccessSlug(
     });
 }
 
-export function checkAccess(
+/**
+ * Vérifie si un slug correspond à un pattern wildcard
+ * Exemples:
+ * - "users.*" correspond à "users.create", "users.update", etc.
+ * - "*" correspond à tout
+ */
+function matchesWildcard(permission: string, requested: string): boolean {
+  // Exact match
+  if (permission === requested) {
+    return true;
+  }
+
+  // Wildcard universel
+  if (permission === "*") {
+    return true;
+  }
+
+  // Wildcard partiel (ex: "users.*" correspond à "users.create")
+  if (permission.endsWith(".*")) {
+    const prefix = permission.slice(0, -2); // Enlève ".*"
+    return requested.startsWith(prefix + ".");
+  }
+
+  return false;
+}
+
+export async function checkAccess(
   userId: number,
   slug: string,
   trx?: TransactionClientContract
 ): Promise<boolean> {
   const { permissionUser, userRole } = Config.get("acl.joinTables");
-  return buildQuery(trx)
+
+  // Récupère toutes les permissions de l'utilisateur
+  const userPermissions = await buildQuery(trx)
     .where((qb) =>
       qb
         .where(`${permissionUser}.user_id`, userId)
         .orWhere(`${userRole}.user_id`, userId)
     )
-    .where("permissions.slug", slug)
-    .then((res) => res.length > 0);
+    .then((res) => res.map((r) => r.slug));
+
+  // Vérifie si une permission correspond (exact ou wildcard)
+  return userPermissions.some((permission) => matchesWildcard(permission, slug));
 }
 
 export function getUserRoles(

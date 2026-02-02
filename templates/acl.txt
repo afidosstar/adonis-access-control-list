@@ -11,15 +11,62 @@
 import { ConfigAclContract } from "@ioc:Adonis/Addons/Acl";
 
 const configAcl: ConfigAclContract = {
+  /*
+  |--------------------------------------------------------------------------
+  | Prefix pour les routes ACL
+  |--------------------------------------------------------------------------
+  |
+  | Préfixe utilisé pour toutes les routes de gestion ACL (si apiOnly = false)
+  |
+  */
   prefix: "acl",
-  // acl Middleware name
-  middlewares: "auth:api",
+
+  /*
+  |--------------------------------------------------------------------------
+  | Middlewares de protection
+  |--------------------------------------------------------------------------
+  |
+  | Middlewares appliqués aux routes de gestion ACL
+  | Exemple: "auth:api" ou ["auth", "admin"]
+  |
+  */
+  middlewares: undefined,
+
+  /*
+  |--------------------------------------------------------------------------
+  | Noms des tables de jointure
+  |--------------------------------------------------------------------------
+  |
+  | Personnalisez les noms des tables pivot selon votre nomenclature
+  |
+  */
   joinTables: {
     permissionRole: "permission_role",
     permissionUser: "permission_user",
     userRole: "user_role",
   },
-  apiOnly: false,
+
+  /*
+  |--------------------------------------------------------------------------
+  | Mode API uniquement
+  |--------------------------------------------------------------------------
+  |
+  | Si true, les routes web de gestion ACL ne seront pas créées
+  | Recommandé pour les applications API pures
+  |
+  */
+  apiOnly: true,
+
+  /*
+  |--------------------------------------------------------------------------
+  | Rôle Super Admin
+  |--------------------------------------------------------------------------
+  |
+  | Slug du rôle qui bypass toutes les vérifications de permissions
+  | L'utilisateur avec ce rôle a accès à tout
+  |
+  */
+  superAdminRole: "super_admin",
 };
 
 export default configAcl;
