@@ -23,8 +23,8 @@ import {
   getUserPermissions,
   getUserRoles,
 } from "../utils";
-import Permission from "@ioc:Adonis/Addons/Acl/Models/Permission";
-import Role from "@ioc:Adonis/Addons/Acl/Models/Role";
+import Permission from "./Permission";
+import Role from "./Role";
 const { permissionUser, userRole } = Config.get("acl.joinTables");
 
 /**

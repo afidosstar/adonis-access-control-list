@@ -17,8 +17,7 @@ import {
   manyToMany,
 } from "@ioc:Adonis/Lucid/Orm";
 import { compose } from "@poppinss/utils/build/src/Helpers";
-// @ts-ignore
-import { SoftDeletes } from "adonis-lucid-soft-deletes";
+import { SoftDeletes } from "@ioc:Adonis/Addons/LucidSoftDeletes";
 import Permission from "./Permission";
 import Config from "@ioc:Adonis/Core/Config";
 const { permissionRole } = Config.get("acl.joinTables");
@@ -46,7 +45,4 @@ export default class Role extends compose(BaseModel, SoftDeletes) {
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   public updatedAt: DateTime;
-
-  @column.dateTime()
-  public deletedAt?: DateTime;
 }

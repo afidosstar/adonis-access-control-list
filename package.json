@@ -1,6 +1,6 @@
 {
   "name": "@fickou/adonis-access-control-list",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Help dev to filter database with query parameters ",
   "main": "build/index.js",
   "scripts": {
@@ -12,7 +12,7 @@
     "test:nyc": "nyc npm run test",
     "coverage": "nyc report --reporter=text-lcov | coveralls",
     "clean": "del-cli build",
-    "compile": "npm run lint && npm run clean && ttsc && npm run copy:files",
+    "compile": "npm run lint && npm run clean && tsc && npm run copy:files",
     "build": "npm run compile",
     "link": "npm run compile && npm link",
     "copy:files": "copyfiles 'instructions.md' build && copyfiles 'ressources/**/*.edge' build && copyfiles 'templates/**/*.txt' build",
@@ -44,10 +44,10 @@
     "@adonisjs/auth": "^8.2.2",
     "@adonisjs/http-server": "^5.11.0",
     "@adonisjs/ioc-transformer": "^2.3.4",
-    "@adonisjs/lucid": "^18.2.0",
     "@adonisjs/mrm-preset": "^5.0.3",
     "@adonisjs/require-ts": "^2.0.13",
     "@adonisjs/view": "^6.2.0",
+    "@poppinss/dev-utils": "^2.0.3",
     "@types/node": "^18.8.4",
     "copyfiles": "^2.4.1",
     "del-cli": "^5.0.0",
@@ -61,8 +61,10 @@
     "nyc": "^15.1.0",
     "prettier": "^2.7.1",
     "reflect-metadata": "^0.1.13",
+    "source-map-support": "^0.5.21",
+    "sqlite3": "^5.1.2",
     "ts-node": "^10.9.1",
-    "ttypescript": "^1.5.13",
+    "ttypescript": "^2.5.2",
     "typescript": "^4.8.4"
   },
   "peerDependencies": {

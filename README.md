@@ -22,6 +22,7 @@
 - [Soft Delete Support](#soft-delete-support)
 - [CLI Commands](#cli-commands)
 - [Protect Routes](#protect-routes)
+- [Testing](#testing)
 
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -500,6 +501,13 @@ export default class UsersController {
 }
 ```
 
+# Testing
+
+Ce package est livré avec une suite de tests complète. Pour exécuter les tests, clonez le dépôt et exécutez la commande suivante :
+
+```bash
+npm test
+```
 
 
 [typescript-image]: https://img.shields.io/badge/Typescript-294E80.svg?logo=typescript

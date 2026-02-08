@@ -11,12 +11,10 @@
       "@adonisjs/lucid",
       "@adonisjs/auth",
       "@adonisjs/view"
-    ],
-    "plugins": [
-      {
-        "transform": "./ioc-transformer.js",
-        "after": true
-      }
     ]
+  },
+  "ts-node": {
+    "files": true,
+    "compiler": "ttypescript"
   }
 }

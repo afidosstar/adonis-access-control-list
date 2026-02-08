@@ -11,3 +11,4 @@
 
 /// <reference path="./adonis-access-control-list.ts"/>
 /// <reference path="./router.ts"/>
+/// <reference types="adonis-lucid-soft-deletes" />
