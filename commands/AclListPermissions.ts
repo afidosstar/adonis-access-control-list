@@ -30,7 +30,9 @@ export default class AclListPermissions extends BaseCommand {
   public group: string | null;
 
   public async run() {
+
     const Database = this.application.container.use("Adonis/Lucid/Database");
+    const table = this.ui.table();
 
     try {
       let query = Database.from("permissions")
@@ -61,9 +63,9 @@ export default class AclListPermissions extends BaseCommand {
         perm.route || "-",
       ]);
 
-      this.ui.table.head(headers);
-      rows.forEach((row) => this.ui.table.row(row));
-      this.ui.table.render();
+      table.head(headers);
+      rows.forEach((row) => table.row(row));
+      table.render();
     } catch (error) {
       this.logger.error(
         `Erreur lors de la récupération des permissions: ${error.message}`

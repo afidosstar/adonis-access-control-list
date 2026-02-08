@@ -50,9 +50,10 @@ export default class AclListRoles extends BaseCommand {
         role.description || "-",
       ]);
 
-      this.ui.table.head(headers);
-      rows.forEach((row) => this.ui.table.row(row));
-      this.ui.table.render();
+      const table = this.ui.table();
+      table.head(headers);
+      rows.forEach((row) => table.row(row));
+      table.render();
     } catch (error) {
       this.logger.error(
         `Erreur lors de la récupération des rôles: ${error.message}`
