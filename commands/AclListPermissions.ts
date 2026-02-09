@@ -30,7 +30,6 @@ export default class AclListPermissions extends BaseCommand {
   public group: string | null;
 
   public async run() {
-
     const Database = this.application.container.use("Adonis/Lucid/Database");
     const table = this.ui.table();
 

@@ -1,24 +1,24 @@
 import test from "japa";
 import { setup, cleanup } from "./bootstrap";
-import { BaseModel, column } from "@ioc:Adonis/Lucid/Orm";
+//@ts-ignore
+import { BaseModel, column } from "@adonisjs/lucid/orm";
 import { BaseUser } from "../src/Models/BaseUser";
 import Role from "../src/Models/Role";
 import Permission from "../src/Models/Permission";
 import { ApplicationContract } from "@ioc:Adonis/Core/Application";
+//@ts-ignore
+import Database from "@adonisjs/lucid/services/db";
 
 // --- Define a concrete User model for testing ---
 class User extends BaseUser(BaseModel) {
-  @column({ isPrimary: true })
-  public id: number;
-
   @column()
   public username: string;
 }
 
 // --- Helper to setup database schema ---
-async function setupSchema(app: ApplicationContract) {
-  const db = app.container.use("Adonis/Lucid/Database");
-  const schema = db.schema;
+async function setupSchema(_app: ApplicationContract) {
+  //const db = _app.container.use("Adonis/Lucid/Database");
+  const schema = Database.schema;
 
   await schema.createTable("users", (table) => {
     table.increments("id");
@@ -165,7 +165,7 @@ test.group("ACL System", (group) => {
   test("hasAnyRole returns true if user has one of the roles", async (assert) => {
     const user = await User.create({ username: "testuser" });
     const role1 = await Role.create({ name: "Editor", slug: "editor" });
-    const role2 = await Role.create({ name: "Viewer", slug: "viewer" });
+    // const role2 = await Role.create({ name: "Viewer", slug: "viewer" });
 
     await user.related("roles").attach([role1.id]);
 
