@@ -50,7 +50,6 @@ export async function setup() {
       "@adonisjs/core",
       "@adonisjs/lucid",
       "adonis-lucid-soft-deletes",
-      join(__dirname, "../providers/AccessControlListProvider"),
     ],
   });
 

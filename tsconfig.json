@@ -1,7 +1,7 @@
 {
   "extends": "./node_modules/@adonisjs/mrm-preset/_tsconfig",
   "compilerOptions": {
-    "moduleResolution": "node"  ,
+    "target": "ES2020",
     "skipLibCheck": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
@@ -11,7 +11,14 @@
       "@adonisjs/core",
       "@adonisjs/lucid",
       "@adonisjs/auth",
-      "@adonisjs/view"
+      "@adonisjs/view",
+      "adonis-lucid-soft-deletes"
+    ],
+    "plugins": [
+      {
+        "transform": "./ioc-transformer.js",
+        "after": true
+      }
     ]
   },
   "ts-node": {

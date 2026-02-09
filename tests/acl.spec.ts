@@ -1,87 +1,25 @@
 import test from "japa";
-import { setup, cleanup } from "./bootstrap";
-//@ts-ignore
-import { BaseModel, column } from "@adonisjs/lucid/orm";
+import {
+  setup,
+  cleanup,
+  setupApplication,
+  getBaseModel,
+} from "../test-helpers";
+import { column } from "@adonisjs/lucid/build/src/Orm/Decorators";
 import { BaseUser } from "../src/Models/BaseUser";
 import Role from "../src/Models/Role";
 import Permission from "../src/Models/Permission";
 import { ApplicationContract } from "@ioc:Adonis/Core/Application";
-//@ts-ignore
-import Database from "@adonisjs/lucid/services/db";
 
-// --- Define a concrete User model for testing ---
-class User extends BaseUser(BaseModel) {
-  @column()
-  public username: string;
-}
-
-// --- Helper to setup database schema ---
-async function setupSchema(_app: ApplicationContract) {
-  //const db = _app.container.use("Adonis/Lucid/Database");
-  const schema = Database.schema;
-
-  await schema.createTable("users", (table) => {
-    table.increments("id");
-    table.string("username");
-    table.timestamps(true);
-  });
-
-  await schema.createTable("roles", (table) => {
-    table.increments("id");
-    table.string("name");
-    table.string("slug").unique();
-    table.string("description").nullable();
-    table.timestamps(true);
-    table.timestamp("deleted_at").nullable();
-  });
-
-  await schema.createTable("permissions", (table) => {
-    table.increments("id");
-    table.string("name");
-    table.string("slug").unique();
-    table.string("description").nullable();
-    table.string("route").nullable();
-    table.string("group").nullable();
-    table.timestamps(true);
-    table.timestamp("deleted_at").nullable();
-  });
-
-  await schema.createTable("role_user", (table) => {
-    table.increments("id");
-    table.integer("user_id").unsigned().references("id").inTable("users");
-    table.integer("role_id").unsigned().references("id").inTable("roles");
-    table.timestamps(true);
-  });
-
-  await schema.createTable("permission_user", (table) => {
-    table.increments("id");
-    table.integer("user_id").unsigned().references("id").inTable("users");
-    table
-      .integer("permission_id")
-      .unsigned()
-      .references("id")
-      .inTable("permissions");
-    table.timestamps(true);
-  });
-
-  await schema.createTable("permission_role", (table) => {
-    table.increments("id");
-    table.integer("role_id").unsigned().references("id").inTable("roles");
-    table
-      .integer("permission_id")
-      .unsigned()
-      .references("id")
-      .inTable("permissions");
-    table.timestamps(true);
-  });
-}
+let BaseModel: any;
 
 test.group("ACL System", (group) => {
   let app: ApplicationContract;
 
   group.before(async () => {
-    app = await setup();
-    await setupSchema(app);
+    app = await setupApplication();
+    BaseModel = getBaseModel(app);
+    await setup();
   });
 
   group.after(async () => {
@@ -89,13 +27,19 @@ test.group("ACL System", (group) => {
   });
 
   group.afterEach(async () => {
-    // Clean up data after each test
-    await User.query().delete();
     await Role.query().delete();
     await Permission.query().delete();
   });
 
   test("it can assign a role to a user", async (assert) => {
+    class User extends BaseUser(BaseModel) {
+      @column({ isPrimary: true })
+      public declare id: number;
+      @column()
+      public declare username: string;
+    }
+    User.boot();
+
     const user = await User.create({ username: "testuser" });
     const role = await Role.create({ name: "Admin", slug: "admin" });
 
@@ -106,6 +50,14 @@ test.group("ACL System", (group) => {
   });
 
   test("it can assign a direct permission to a user", async (assert) => {
+    class User extends BaseUser(BaseModel) {
+      @column({ isPrimary: true })
+      public declare id: number;
+      @column()
+      public declare username: string;
+    }
+    User.boot();
+
     const user = await User.create({ username: "testuser" });
     const permission = await Permission.create({
       name: "Create User",
@@ -119,6 +71,14 @@ test.group("ACL System", (group) => {
   });
 
   test("user inherits permissions from role", async (assert) => {
+    class User extends BaseUser(BaseModel) {
+      @column({ isPrimary: true })
+      public declare id: number;
+      @column()
+      public declare username: string;
+    }
+    User.boot();
+
     const user = await User.create({ username: "testuser" });
     const role = await Role.create({ name: "Editor", slug: "editor" });
     const permission = await Permission.create({
@@ -137,6 +97,14 @@ test.group("ACL System", (group) => {
   });
 
   test("wildcard permission matches specific action", async (assert) => {
+    class User extends BaseUser(BaseModel) {
+      @column({ isPrimary: true })
+      public declare id: number;
+      @column()
+      public declare username: string;
+    }
+    User.boot();
+
     const user = await User.create({ username: "testuser" });
     const permission = await Permission.create({
       name: "Manage Users",
@@ -151,6 +119,14 @@ test.group("ACL System", (group) => {
   });
 
   test("universal wildcard matches everything", async (assert) => {
+    class User extends BaseUser(BaseModel) {
+      @column({ isPrimary: true })
+      public declare id: number;
+      @column()
+      public declare username: string;
+    }
+    User.boot();
+
     const user = await User.create({ username: "testuser" });
     const permission = await Permission.create({
       name: "Super Access",
@@ -163,6 +139,14 @@ test.group("ACL System", (group) => {
   });
 
   test("hasAnyRole returns true if user has one of the roles", async (assert) => {
+    class User extends BaseUser(BaseModel) {
+      @column({ isPrimary: true })
+      public declare id: number;
+      @column()
+      public declare username: string;
+    }
+    User.boot();
+
     const user = await User.create({ username: "testuser" });
     const role1 = await Role.create({ name: "Editor", slug: "editor" });
     // const role2 = await Role.create({ name: "Viewer", slug: "viewer" });
@@ -174,6 +158,14 @@ test.group("ACL System", (group) => {
   });
 
   test("hasAllRoles returns true only if user has all roles", async (assert) => {
+    class User extends BaseUser(BaseModel) {
+      @column({ isPrimary: true })
+      public declare id: number;
+      @column()
+      public declare username: string;
+    }
+    User.boot();
+
     const user = await User.create({ username: "testuser" });
     const role1 = await Role.create({ name: "Editor", slug: "editor" });
     const role2 = await Role.create({ name: "Viewer", slug: "viewer" });
@@ -185,6 +177,14 @@ test.group("ACL System", (group) => {
   });
 
   test("isSuperAdmin checks for configured super admin role", async (assert) => {
+    class User extends BaseUser(BaseModel) {
+      @column({ isPrimary: true })
+      public declare id: number;
+      @column()
+      public declare username: string;
+    }
+    User.boot();
+
     const user = await User.create({ username: "testuser" });
     const superRole = await Role.create({
       name: "Super Admin",

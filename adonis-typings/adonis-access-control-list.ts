@@ -6,8 +6,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-/// <reference types="@adonisjs/lucid" />
-/// <reference types="@adonisjs/lucid" />
 
 declare module "@ioc:Adonis/Addons/Acl/Models/Permission" {
   import { LucidModel, LucidRow } from "@ioc:Adonis/Lucid/Orm";
