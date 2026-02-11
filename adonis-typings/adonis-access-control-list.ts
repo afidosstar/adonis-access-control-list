@@ -7,14 +7,13 @@
  * file that was distributed with this source code.
  */
 
-declare module "@ioc:Adonis/Addons/Acl/Models/Permission" {
-  import { LucidModel, LucidRow } from "@ioc:Adonis/Lucid/Orm";
-  import { DateTime } from "luxon";
-  // @ts-ignore
-  import { SoftDeletes } from "adonis-lucid-soft-deletes";
 
-  export interface PermissionInterface {
-    id: number;
+
+declare module '@ioc:Adonis/Addons/Acl/Models/Permission' {
+  import { LucidModel, LucidRow } from '@ioc:Adonis/Lucid/Orm'
+  import { DateTime } from 'luxon'
+
+  export interface PermissionAttributesMixin extends LucidRow{
     name: string;
     slug: string;
     description: string;
@@ -24,105 +23,94 @@ declare module "@ioc:Adonis/Addons/Acl/Models/Permission" {
     updatedAt: DateTime;
     deletedAt?: DateTime;
   }
+  interface PermissionMixin extends LucidModel{
+    new (...args: any[]): PermissionAttributesMixin;
+  }
 
-  export type PermissionModelType = LucidModel & {
-    new (...args: any[]): LucidRow & PermissionInterface;
-  };
-
-  const Permission: PermissionModelType & SoftDeletes;
-  export default Permission;
+  const Permission: PermissionMixin;
+  export default Permission
 }
 
-declare module "@ioc:Adonis/Addons/Acl/Models/Role" {
-  import { LucidModel, LucidRow, ManyToMany } from "@ioc:Adonis/Lucid/Orm";
-  import { PermissionModelType } from "@ioc:Adonis/Addons/Acl/Models/Permission";
-  import { DateTime } from "luxon";
-  // @ts-ignore
-  import { SoftDeletes } from "adonis-lucid-soft-deletes";
+declare module '@ioc:Adonis/Addons/Acl/Models/Role' {
+  import { LucidModel, LucidRow, ManyToMany } from '@ioc:Adonis/Lucid/Orm'
+  import { DateTime } from 'luxon'
+  import Permission from "@ioc:Adonis/Addons/Acl/Models/Permission";
 
-  export interface RoleInterface {
+  export interface RoleAttributesMixin extends LucidRow {
     id: number;
     name: string;
     slug: string;
     description: string;
-    permissions: ManyToMany<PermissionModelType>;
+    permissions: ManyToMany<typeof Permission>;
     createdAt: DateTime;
     updatedAt: DateTime;
     deletedAt?: DateTime;
   }
 
-  export type RoleModelType = LucidModel & {
-    new (...args: any[]): LucidRow & RoleInterface;
-  };
+  interface  RoleModelMixin extends LucidModel{
+    new (...args: any[]): RoleAttributesMixin;
+  }
 
-  const Role: RoleModelType & SoftDeletes;
-
-  export default Role;
+  const Role: RoleModelMixin
+  export default Role
 }
 
-declare module "@ioc:Adonis/Addons/Acl" {
-  import {
-    ColumnOptions,
-    LucidRow,
-    LucidModel,
-    ManyToMany,
-  } from "@ioc:Adonis/Lucid/Orm";
-  import { RouteMiddlewareHandler } from "@ioc:Adonis/Core/Route";
-  import { NormalizeConstructor } from "@poppinss/utils/build/src/Helpers";
-  import { PermissionModelType } from "@ioc:Adonis/Addons/Acl/Models/Permission";
-  import { RoleModelType } from "@ioc:Adonis/Addons/Acl/Models/Role";
+declare module '@ioc:Adonis/Addons/Acl' {
+  import { LucidModel, LucidRow, ManyToMany, ColumnOptions } from '@ioc:Adonis/Lucid/Orm'
+  import { RouteMiddlewareHandler } from '@ioc:Adonis/Core/Route'
+  import { NormalizeConstructor } from '@poppinss/utils/build/src/Helpers'
+  import Permission from '@ioc:Adonis/Addons/Acl/Models/Permission'
+  import Role from '@ioc:Adonis/Addons/Acl/Models/Role'
 
   export type AccessRouteContract = {
-    name: string;
-    description: string;
-    group?: string;
-  };
+    name: string
+    description: string
+    group?: string
+  }
 
   export interface ConfigAclContract {
-    prefix?: string;
-    middlewares?: RouteMiddlewareHandler | RouteMiddlewareHandler[];
+    prefix?: string
+    middlewares?: RouteMiddlewareHandler | RouteMiddlewareHandler[]
     joinTables: {
       permissionRole: string;
       permissionUser: string;
-      userRole: string;
-    };
-    apiOnly: boolean;
-    superAdminRole?: string;
+      userRole: string
+    }
+    apiOnly: boolean
+    superAdminRole?: string
   }
 
-  export type AclAuthDecorator = (target: LucidRow, property: string) => void;
+  export type AclAuthDecorator = (target: LucidRow, property: string) => void
 
   export type AclAuthUser = {
-    roles: ManyToMany<RoleModelType>;
-    permissions: ManyToMany<PermissionModelType>;
+    roles: ManyToMany<typeof Role>
+    permissions: ManyToMany<typeof  Permission>
 
-    getAccesses(): Promise<string[]>;
-    can(slug: string): Promise<boolean>;
-    getRoles(): Promise<string[]>;
-    getPermissions(): Promise<string[]>;
+    getAccesses(): Promise<string[]>
+    can(slug: string): Promise<boolean>
+    getRoles(): Promise<string[]>
+    getPermissions(): Promise<string[]>
 
-    hasRole(slug: string): Promise<boolean>;
-    hasAnyRole(slugs: string[]): Promise<boolean>;
-    hasAllRoles(slugs: string[]): Promise<boolean>;
+    hasRole(slug: string): Promise<boolean>
+    hasAnyRole(slugs: string[]): Promise<boolean>
+    hasAllRoles(slugs: string[]): Promise<boolean>
 
-    hasPermission(slug: string): Promise<boolean>;
-    hasAnyPermission(slugs: string[]): Promise<boolean>;
-    hasAllPermissions(slugs: string[]): Promise<boolean>;
+    hasPermission(slug: string): Promise<boolean>
+    hasAnyPermission(slugs: string[]): Promise<boolean>
+    hasAllPermissions(slugs: string[]): Promise<boolean>
 
-    isSuperAdmin(): Promise<boolean>;
-    loadPermissions(): Promise<void>;
-  };
-  interface AuthUserFn {
-    (
-      options?: Partial<ColumnOptions & { isUpdated?: boolean }>
-    ): AclAuthDecorator;
+    isSuperAdmin(): Promise<boolean>
+    loadPermissions(): Promise<void>
   }
-  type ExtendUser = <T extends NormalizeConstructor<LucidModel>>(
-    superclass: T
-  ) => T & {
-    new (...args: any[]): AclAuthUser;
-  };
 
-  export const authUser: AuthUserFn;
-  export const BaseUser: ExtendUser;
+  interface AuthUserFn {
+    (options?: Partial<ColumnOptions & { isUpdated?: boolean }>): AclAuthDecorator
+  }
+
+  type ExtendUser = <T extends NormalizeConstructor<LucidModel>>(superclass: T) => T & {
+    new (...args: any[]): AclAuthUser
+  }
+
+  export const authUser: AuthUserFn
+  export const BaseUser: ExtendUser
 }

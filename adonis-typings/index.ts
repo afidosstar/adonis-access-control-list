@@ -1,5 +1,3 @@
-// @ts-ignore
-
 /*
  * @created 11/10/2022 - 20:15
  * @project adonis-controller-helpers
@@ -8,7 +6,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-/// <reference types="@adonisjs/lucid" />
-/// <reference types="adonis-lucid-soft-deletes" />
+
 /// <reference path="./adonis-access-control-list.ts"/>
 /// <reference path="./router.ts"/>
