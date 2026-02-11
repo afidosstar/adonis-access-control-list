@@ -1,6 +1,6 @@
 node_modules
 coverage
-test/__app
+tests/__app
 .DS_STORE
 .nyc_output
 .idea

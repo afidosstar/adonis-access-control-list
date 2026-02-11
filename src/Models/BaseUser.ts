@@ -17,12 +17,7 @@ import {
 } from "@ioc:Adonis/Lucid/Orm";
 import { NormalizeConstructor } from "@poppinss/utils/build/src/Helpers";
 import Config from "@ioc:Adonis/Core/Config";
-import {
-  checkAccess,
-  getUserAccessSlug,
-  getUserPermissions,
-  getUserRoles,
-} from "../utils";
+import { checkAccess, getUserPermissions, getUserRoles } from "../utils";
 import Permission from "./Permission";
 import Role from "./Role";
 const { permissionUser, userRole } = Config.get("acl.joinTables");
@@ -55,13 +50,6 @@ export function BaseUser<T extends NormalizeConstructor<LucidModel>>(
       pivotRelatedForeignKey: "permission_id",
     })
     public permissions: ManyToMany<typeof Permission>;
-
-    /**
-     * Récupère tous les slugs de permissions accessibles par l'utilisateur
-     */
-    public getAccesses(): Promise<string[]> {
-      return getUserAccessSlug(this.$primaryKeyValue as number, this.$trx);
-    }
 
     /**
      * Vérifie si l'utilisateur a une permission spécifique

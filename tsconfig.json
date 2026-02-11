@@ -2,23 +2,36 @@
   "extends": "./node_modules/@adonisjs/mrm-preset/_tsconfig",
   "compilerOptions": {
     "target": "ES2020",
+    "moduleResolution": "node",
     "skipLibCheck": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "useDefineForClassFields": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "noEmit": true, // pas besoin d'émettre du JS pour les tests
+    "isolatedModules": true, // important pour ts-node / require-ts
+    "resolveJsonModule": true,
+    "forceConsistentCasingInFileNames": true,
     "types": [
       "@types/node",
       "@adonisjs/core",
       "@adonisjs/lucid",
       "@adonisjs/auth",
       "@adonisjs/view",
-      "adonis-lucid-soft-deletes"
+      "adonis-lucid-soft-deletes",
+      "japa"
     ],
     "plugins": [
       {
         "transform": "./ioc-transformer.js",
+        "transformProgram": true,
         "after": true
       }
     ]
+  },
+  "ts-node": {
+    "files": true,
+    "compiler": "ttypescript"
   }
 }

@@ -47,6 +47,7 @@ export default class AccessControlProvider {
   private registerOther() {
     this.app.container.singleton("Adonis/Addons/Acl", () => {
       const { BaseUser } = require("../src/Models/BaseUser");
+      console.log("BaseUser", BaseUser);
       return {
         authUser: authUserBuilder(this.app.container),
         BaseUser,
