@@ -10,7 +10,6 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "noEmit": true, // pas besoin d'émettre du JS pour les tests
-    "isolatedModules": true, // important pour ts-node / require-ts
     "resolveJsonModule": true,
     "forceConsistentCasingInFileNames": true,
     "types": [
@@ -19,8 +18,7 @@
       "@adonisjs/lucid",
       "@adonisjs/auth",
       "@adonisjs/view",
-      "adonis-lucid-soft-deletes",
-      "japa"
+      "adonis-lucid-soft-deletes"
     ],
     "plugins": [
       {
