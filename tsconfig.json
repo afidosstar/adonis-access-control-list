@@ -9,7 +9,6 @@
     "useDefineForClassFields": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    "noEmit": true, // pas besoin d'émettre du JS pour les tests
     "resolveJsonModule": true,
     "forceConsistentCasingInFileNames": true,
     "types": [
@@ -23,7 +22,6 @@
     "plugins": [
       {
         "transform": "./ioc-transformer.js",
-        "transformProgram": true,
         "after": true
       }
     ]
