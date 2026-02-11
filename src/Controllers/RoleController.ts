@@ -12,7 +12,7 @@
 import { HttpContextContract } from "@ioc:Adonis/Core/HttpContext";
 import Database from "@ioc:Adonis/Lucid/Database";
 import { rules, schema } from "@ioc:Adonis/Core/Validator";
-import Role from "@ioc:Adonis/Addons/Acl/Models/Role";
+import Role from "../Models/Role";
 
 export default class RoleController {
   public async index({ view }: HttpContextContract) {

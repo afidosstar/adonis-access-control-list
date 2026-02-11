@@ -7,13 +7,13 @@
  * file that was distributed with this source code.
  */
 
+declare module "@ioc:Adonis/Addons/Acl/Models/Permission" {
+  import { LucidModel, LucidRow } from "@ioc:Adonis/Lucid/Orm";
+  import { DateTime } from "luxon";
+  import { SoftDeletes } from "@ioc:Adonis/Addons/LucidSoftDeletes";
 
-
-declare module '@ioc:Adonis/Addons/Acl/Models/Permission' {
-  import { LucidModel, LucidRow } from '@ioc:Adonis/Lucid/Orm'
-  import { DateTime } from 'luxon'
-
-  export interface PermissionAttributesMixin extends LucidRow{
+  export interface PermissionInterface {
+    id: number;
     name: string;
     slug: string;
     description: string;
@@ -23,94 +23,105 @@ declare module '@ioc:Adonis/Addons/Acl/Models/Permission' {
     updatedAt: DateTime;
     deletedAt?: DateTime;
   }
-  interface PermissionMixin extends LucidModel{
-    new (...args: any[]): PermissionAttributesMixin;
-  }
 
-  const Permission: PermissionMixin;
-  export default Permission
+  export type PermissionModelType = LucidModel & {
+    new (...args: any[]): LucidRow & PermissionInterface;
+  } & typeof SoftDeletes;
+
+  const Permission: PermissionModelType;
+  export default Permission;
 }
 
-declare module '@ioc:Adonis/Addons/Acl/Models/Role' {
-  import { LucidModel, LucidRow, ManyToMany } from '@ioc:Adonis/Lucid/Orm'
-  import { DateTime } from 'luxon'
-  import Permission from "@ioc:Adonis/Addons/Acl/Models/Permission";
+declare module "@ioc:Adonis/Addons/Acl/Models/Role" {
+  import { LucidModel, LucidRow, ManyToMany } from "@ioc:Adonis/Lucid/Orm";
+  import { DateTime } from "luxon";
+  import { SoftDeletes } from "@ioc:Adonis/Addons/LucidSoftDeletes";
+  import { PermissionModelType } from "@ioc:Adonis/Addons/Acl/Models/Permission";
 
-  export interface RoleAttributesMixin extends LucidRow {
+  export interface RoleInterface {
     id: number;
     name: string;
     slug: string;
     description: string;
-    permissions: ManyToMany<typeof Permission>;
+    permissions: ManyToMany<PermissionModelType>;
     createdAt: DateTime;
     updatedAt: DateTime;
     deletedAt?: DateTime;
   }
 
-  interface  RoleModelMixin extends LucidModel{
-    new (...args: any[]): RoleAttributesMixin;
-  }
+  export type RoleModelType = LucidModel & {
+    new (...args: any[]): LucidRow & RoleInterface;
+  } & typeof SoftDeletes;
 
-  const Role: RoleModelMixin
-  export default Role
+  const Role: RoleModelType;
+  export default Role;
 }
 
-declare module '@ioc:Adonis/Addons/Acl' {
-  import { LucidModel, LucidRow, ManyToMany, ColumnOptions } from '@ioc:Adonis/Lucid/Orm'
-  import { RouteMiddlewareHandler } from '@ioc:Adonis/Core/Route'
-  import { NormalizeConstructor } from '@poppinss/utils/build/src/Helpers'
-  import Permission from '@ioc:Adonis/Addons/Acl/Models/Permission'
-  import Role from '@ioc:Adonis/Addons/Acl/Models/Role'
+declare module "@ioc:Adonis/Addons/Acl" {
+  import {
+    LucidModel,
+    LucidRow,
+    ManyToMany,
+    ColumnOptions,
+  } from "@ioc:Adonis/Lucid/Orm";
+  import { RouteMiddlewareHandler } from "@ioc:Adonis/Core/Route";
+  import { NormalizeConstructor } from "@poppinss/utils/build/src/Helpers";
+  import { PermissionModelType } from "@ioc:Adonis/Addons/Acl/Models/Permission";
+  import { RoleModelType } from "@ioc:Adonis/Addons/Acl/Models/Role";
 
   export type AccessRouteContract = {
-    name: string
-    description: string
-    group?: string
-  }
+    name: string;
+    description: string;
+    group?: string;
+  };
 
   export interface ConfigAclContract {
-    prefix?: string
-    middlewares?: RouteMiddlewareHandler | RouteMiddlewareHandler[]
+    prefix?: string;
+    middlewares?: RouteMiddlewareHandler | RouteMiddlewareHandler[];
     joinTables: {
       permissionRole: string;
       permissionUser: string;
-      userRole: string
-    }
-    apiOnly: boolean
-    superAdminRole?: string
+      userRole: string;
+    };
+    apiOnly: boolean;
+    superAdminRole?: string;
   }
 
-  export type AclAuthDecorator = (target: LucidRow, property: string) => void
+  export type AclAuthDecorator = (target: LucidRow, property: string) => void;
 
   export type AclAuthUser = {
-    roles: ManyToMany<typeof Role>
-    permissions: ManyToMany<typeof  Permission>
+    roles: ManyToMany<RoleModelType>;
+    permissions: ManyToMany<PermissionModelType>;
 
-    getAccesses(): Promise<string[]>
-    can(slug: string): Promise<boolean>
-    getRoles(): Promise<string[]>
-    getPermissions(): Promise<string[]>
+    getAccesses(): Promise<string[]>;
+    can(slug: string): Promise<boolean>;
+    getRoles(): Promise<string[]>;
+    getPermissions(): Promise<string[]>;
 
-    hasRole(slug: string): Promise<boolean>
-    hasAnyRole(slugs: string[]): Promise<boolean>
-    hasAllRoles(slugs: string[]): Promise<boolean>
+    hasRole(slug: string): Promise<boolean>;
+    hasAnyRole(slugs: string[]): Promise<boolean>;
+    hasAllRoles(slugs: string[]): Promise<boolean>;
 
-    hasPermission(slug: string): Promise<boolean>
-    hasAnyPermission(slugs: string[]): Promise<boolean>
-    hasAllPermissions(slugs: string[]): Promise<boolean>
+    hasPermission(slug: string): Promise<boolean>;
+    hasAnyPermission(slugs: string[]): Promise<boolean>;
+    hasAllPermissions(slugs: string[]): Promise<boolean>;
 
-    isSuperAdmin(): Promise<boolean>
-    loadPermissions(): Promise<void>
-  }
+    isSuperAdmin(): Promise<boolean>;
+    loadPermissions(): Promise<void>;
+  };
 
   interface AuthUserFn {
-    (options?: Partial<ColumnOptions & { isUpdated?: boolean }>): AclAuthDecorator
+    (
+      options?: Partial<ColumnOptions & { isUpdated?: boolean }>
+    ): AclAuthDecorator;
   }
 
-  type ExtendUser = <T extends NormalizeConstructor<LucidModel>>(superclass: T) => T & {
-    new (...args: any[]): AclAuthUser
-  }
+  type ExtendUser = <T extends NormalizeConstructor<LucidModel>>(
+    superclass: T
+  ) => T & {
+    new (...args: any[]): AclAuthUser;
+  };
 
-  export const authUser: AuthUserFn
-  export const BaseUser: ExtendUser
+  export const authUser: AuthUserFn;
+  export const BaseUser: ExtendUser;
 }
