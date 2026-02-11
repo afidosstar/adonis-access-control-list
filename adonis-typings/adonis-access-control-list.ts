@@ -5,6 +5,7 @@
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
+ *
  */
 
 declare module '@ioc:Adonis/Addons/Acl/Models/Permission' {
@@ -24,11 +25,11 @@ declare module '@ioc:Adonis/Addons/Acl/Models/Permission' {
     deletedAt?: DateTime
   }
 
-  export interface PermissionModel extends LucidModel {
+  export type PermissionModel = LucidModel & {
     new (...args: any[]): Permission
-  }
+  } & typeof SoftDeletes
 
-  const Permission: PermissionModel & typeof SoftDeletes
+  const Permission: PermissionModel
   export default Permission
 }
 
@@ -49,11 +50,11 @@ declare module '@ioc:Adonis/Addons/Acl/Models/Role' {
     deletedAt?: DateTime
   }
 
-  export interface RoleModel extends LucidModel {
+  export type RoleModel = LucidModel & {
     new (...args: any[]): Role
-  }
+  } & typeof SoftDeletes
 
-  const Role: RoleModel & typeof SoftDeletes
+  const Role: RoleModel
   export default Role
 }
 
