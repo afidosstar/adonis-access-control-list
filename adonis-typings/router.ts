@@ -16,7 +16,7 @@ declare module "@ioc:Adonis/Core/Route" {
   }
 
   interface RouteACLContract {
-    access(name: string, description?: string, group?: string): this;
+    access(slug: string, name: string, group?: string): this;
     profile(name: string): this;
   }
 

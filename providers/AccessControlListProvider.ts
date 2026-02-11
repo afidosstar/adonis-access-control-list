@@ -10,10 +10,10 @@
  */
 
 import {
-  ResourceRouteNames,
+  //ResourceRouteNames,
   RouteContract,
   RouteJSON,
-  RouteMiddlewareHandler,
+  //RouteMiddlewareHandler,
   RouteResourceContract,
 } from "@ioc:Adonis/Core/Route";
 import { ApplicationContract } from "@ioc:Adonis/Core/Application";
@@ -83,10 +83,10 @@ export default class AccessControlProvider {
     this.addWebPermission(configACL);
   }
 
-  private accessCallbackFn(this: RouteContract, name, description, group) {
+  private accessCallbackFn(this: RouteContract, slug, name, group) {
     (this as any).authorizeRoute = {
-      name: name,
-      description: description || "",
+      slug: slug,
+      name: name || slug,
       group: group,
     };
 
@@ -96,35 +96,35 @@ export default class AccessControlProvider {
 
   private accessResourceCallbackFn(
     this: RouteResourceContract,
+    slug,
     name,
-    description,
     group
   ) {
-    const replaceList = { index: "list", store: "create" };
+    const replaceList = { index: "list", store: "create", destroy: "delete" };
     const map: [string, string[]][] = [
-      ["List", ["index"]],
-      ["create", ["store", "create"]],
-      ["Update", ["edit", "update"]],
-      ["Show", ["show"]],
-      ["delete", ["destroy"]],
+      ["Liste", ["index"]],
+      ["Création", ["store", "create"]],
+      ["Mise à jour", ["edit", "update"]],
+      ["Affichage", ["show"]],
+      ["Suppression", ["destroy"]],
     ];
-    const middlewareMap: {
-      [P in ResourceRouteNames]?:
-        | RouteMiddlewareHandler
-        | RouteMiddlewareHandler[];
-    } = {};
+    // const middlewareMap: {
+    //   [P in ResourceRouteNames]?:
+    //     | RouteMiddlewareHandler
+    //     | RouteMiddlewareHandler[];
+    // } = {};
     this.routes.forEach((route) => {
       const routeTag = route.name.replace(/.*\.([a-z])/, "$1");
       const [label] = map.find(([_, tags]) => tags.includes(routeTag))!;
 
       const authorizeRoute: AccessRouteContract = {
-        name: `${replaceList[routeTag] || routeTag}_${name}`,
-        description: `${label} ${description}`,
+        slug: `${replaceList[routeTag] || routeTag}_${slug}`,
+        name: `${label} - ${name}`,
         group: group,
       };
 
       (route as any).authorizeRoute = authorizeRoute;
-      middlewareMap[route.name] = [`authorize:${authorizeRoute.name}`];
+      //middlewareMap[route.name] = [`authorize:${authorizeRoute.slug}`];
     });
     //this.middleware(middlewareMap);
     return this;

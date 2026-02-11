@@ -20,9 +20,5 @@
         "after": true
       }
     ]
-  },
-  "ts-node": {
-    "files": true,
-    "compiler": "ttypescript"
   }
 }

@@ -72,7 +72,6 @@ declare module "@ioc:Adonis/Addons/Acl/Models/Permission" {
     group: string;
     createdAt: DateTime;
     updatedAt: DateTime;
-    deletedAt?: DateTime | null;
   }
 
   export type PermissionModel = WithSoftDeletes<
@@ -102,9 +101,6 @@ declare module "@ioc:Adonis/Addons/Acl/Models/Role" {
     permissions: ManyToMany<PermissionModel>;
     createdAt: DateTime;
     updatedAt: DateTime;
-    deletedAt?: DateTime | null;
-    restore(): Promise<void>;
-    forceDelete(): Promise<void>;
   }
 
   export type RoleModel = WithSoftDeletes<
@@ -128,8 +124,8 @@ declare module "@ioc:Adonis/Addons/Acl" {
   import { RoleModel } from "@ioc:Adonis/Addons/Acl/Models/Role";
 
   export interface AccessRouteContract {
+    slug: string;
     name: string;
-    description: string;
     group?: string;
   }
 

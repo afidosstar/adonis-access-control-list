@@ -1,6 +1,6 @@
 {
   "name": "@fickou/adonis-access-control-list",
-  "version": "2.0.6",
+  "version": "2.0.7",
   "description": "Help dev to filter database with query parameters ",
   "main": "build/index.js",
   "scripts": {
@@ -8,7 +8,7 @@
     "lint": "eslint . --ext=.ts --fix",
     "lint:clean": "prettier --write ./src ./providers ./adonis-typings",
     "pretest": "npm run lint",
-    "test": "ts-node -r source-map-support/register japaFile.ts",
+    "test": "node -r @adonisjs/require-ts/build/register -r source-map-support/register japaFile.ts",
     "test:nyc": "nyc npm run test",
     "coverage": "nyc report --reporter=text-lcov | coveralls",
     "clean": "del-cli build",
@@ -42,12 +42,13 @@
   "devDependencies": {
     "@adonisjs/assembler": "^5.9.3",
     "@adonisjs/auth": "^8.2.2",
+    "@adonisjs/lucid": "^18.2.0",
     "@adonisjs/http-server": "^5.11.0",
     "@adonisjs/ioc-transformer": "^2.3.4",
-    "@adonisjs/lucid": "^18.2.0",
     "@adonisjs/mrm-preset": "^5.0.3",
     "@adonisjs/require-ts": "^2.0.13",
     "@adonisjs/view": "^6.2.0",
+    "@japa/runner": "^2.5.1",
     "@poppinss/dev-utils": "^2.0.3",
     "@types/node": "^18.8.4",
     "copyfiles": "^2.4.1",
@@ -65,7 +66,7 @@
     "source-map-support": "^0.5.21",
     "sqlite3": "^5.1.2",
     "ts-node": "^10.9.1",
-    "ttypescript": "^1.5.15",
+    "ttypescript": "^2.5.2",
     "typescript": "^4.8.4"
   },
   "peerDependencies": {

@@ -13,7 +13,7 @@ const fs = new Filesystem(join(__dirname, "tmp"));
 
 export const dbConfig: SqliteConfig = {
   client: "sqlite3",
-  connection: { filename: join(fs.basePath, "db.sqlite3") },
+  connection: { filename: ":memory:" },
   debug: false,
   useNullAsDefault: true,
 };
@@ -134,8 +134,16 @@ export async function setupApplication(): Promise<ApplicationContract> {
   await fs.add(
     "config/database.ts",
     `
-      const dbConfig = undefined
-      export default dbConfig
+      export const connection = 'sqlite'
+      export const connections = {
+        sqlite: {
+          client: 'sqlite3',
+          connection: {
+            filename: ':memory:',
+          },
+          useNullAsDefault: true,
+        }
+      }
     `
   );
 
@@ -154,11 +162,37 @@ export async function setupApplication(): Promise<ApplicationContract> {
   `
   );
 
+  // Créer un .adonisrc.json temporaire
+  await fs.add(
+    ".adonisrc.json",
+    JSON.stringify(
+      {
+        typescript: true,
+        providers: [
+          "@adonisjs/core",
+          "@adonisjs/lucid",
+          "@adonisjs/view",
+          "adonis-lucid-soft-deletes",
+          "../../providers/AccessControlListProvider",
+        ],
+        preloads: [],
+        metaFiles: [],
+        commands: [],
+        aliases: {
+          App: "app",
+        },
+      },
+      null,
+      2
+    )
+  );
+
   const app = new Application(fs.basePath, "test", {
     aliases: { App: "./app" },
     providers: [
       "@adonisjs/core",
       "@adonisjs/lucid",
+      "@adonisjs/view",
       "adonis-lucid-soft-deletes",
       "../../providers/AccessControlListProvider",
     ],

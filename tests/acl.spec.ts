@@ -1,37 +1,41 @@
 import test from "japa";
-import {
-  setup,
-  cleanup,
-  setupApplication,
-  getBaseModel,
-} from "../test-helpers";
+import { cleanup, getBaseModel, setupApplication } from "../test-helpers";
 import { column } from "@adonisjs/lucid/build/src/Orm/Decorators";
-import { BaseUser } from "../src/Models/BaseUser";
-import Role from "../src/Models/Role";
-import Permission from "../src/Models/Permission";
 import { ApplicationContract } from "@ioc:Adonis/Core/Application";
 
 let BaseModel: any;
+let app: ApplicationContract;
 
 test.group("ACL System", (group) => {
-  let app: ApplicationContract;
-
   group.before(async () => {
+    // Récupérer l'application initialisée globalement dans japaFile.ts
     app = await setupApplication();
     BaseModel = getBaseModel(app);
-    await setup();
   });
 
+  // Pas de cleanup ici car il est géré globalement dans japaFile.ts
   group.after(async () => {
     await cleanup();
   });
 
   group.afterEach(async () => {
-    await Role.query().delete();
-    await Permission.query().delete();
+    console.log("app", app);
+    const Role = app.container.use("Adonis/Addons/Acl/Models/Role");
+    const Permission = app.container.use("Adonis/Addons/Acl/Models/Permission");
+    // On utilise delete() sans where pour tout supprimer, mais attention aux contraintes de clé étrangère
+    // L'ordre est important ou utiliser truncate si supporté par sqlite (non)
+    // Pour sqlite, delete() est ok.
+    try {
+      await Role.query().delete();
+      await Permission.query().delete();
+    } catch (e) {
+      console.error("Error cleaning up:", e);
+    }
   });
 
   test("it can assign a role to a user", async (assert) => {
+    const BaseUser = app.container.use("Adonis/Addons/Acl").BaseUser;
+    const Role = app.container.use("Adonis/Addons/Acl/Models/Role");
     class User extends BaseUser(BaseModel) {
       @column({ isPrimary: true })
       public declare id: number;
@@ -50,6 +54,8 @@ test.group("ACL System", (group) => {
   });
 
   test("it can assign a direct permission to a user", async (assert) => {
+    const BaseUser = app.container.use("Adonis/Addons/Acl").BaseUser;
+    const Permission = app.container.use("Adonis/Addons/Acl/Models/Permission");
     class User extends BaseUser(BaseModel) {
       @column({ isPrimary: true })
       public declare id: number;
@@ -71,6 +77,9 @@ test.group("ACL System", (group) => {
   });
 
   test("user inherits permissions from role", async (assert) => {
+    const BaseUser = app.container.use("Adonis/Addons/Acl").BaseUser;
+    const Permission = app.container.use("Adonis/Addons/Acl/Models/Permission");
+    const Role = app.container.use("Adonis/Addons/Acl/Models/Role");
     class User extends BaseUser(BaseModel) {
       @column({ isPrimary: true })
       public declare id: number;
@@ -97,6 +106,8 @@ test.group("ACL System", (group) => {
   });
 
   test("wildcard permission matches specific action", async (assert) => {
+    const BaseUser = app.container.use("Adonis/Addons/Acl").BaseUser;
+    const Permission = app.container.use("Adonis/Addons/Acl/Models/Permission");
     class User extends BaseUser(BaseModel) {
       @column({ isPrimary: true })
       public declare id: number;
@@ -119,6 +130,9 @@ test.group("ACL System", (group) => {
   });
 
   test("universal wildcard matches everything", async (assert) => {
+    const BaseUser = app.container.use("Adonis/Addons/Acl").BaseUser;
+    const Permission = app.container.use("Adonis/Addons/Acl/Models/Permission");
+
     class User extends BaseUser(BaseModel) {
       @column({ isPrimary: true })
       public declare id: number;
@@ -139,6 +153,9 @@ test.group("ACL System", (group) => {
   });
 
   test("hasAnyRole returns true if user has one of the roles", async (assert) => {
+    const BaseUser = app.container.use("Adonis/Addons/Acl").BaseUser;
+    const Role = app.container.use("Adonis/Addons/Acl/Models/Role");
+
     class User extends BaseUser(BaseModel) {
       @column({ isPrimary: true })
       public declare id: number;
@@ -158,6 +175,9 @@ test.group("ACL System", (group) => {
   });
 
   test("hasAllRoles returns true only if user has all roles", async (assert) => {
+    const BaseUser = app.container.use("Adonis/Addons/Acl").BaseUser;
+    const Role = app.container.use("Adonis/Addons/Acl/Models/Role");
+
     class User extends BaseUser(BaseModel) {
       @column({ isPrimary: true })
       public declare id: number;
@@ -177,6 +197,9 @@ test.group("ACL System", (group) => {
   });
 
   test("isSuperAdmin checks for configured super admin role", async (assert) => {
+    const BaseUser = app.container.use("Adonis/Addons/Acl").BaseUser;
+    const Role = app.container.use("Adonis/Addons/Acl/Models/Role");
+
     class User extends BaseUser(BaseModel) {
       @column({ isPrimary: true })
       public declare id: number;

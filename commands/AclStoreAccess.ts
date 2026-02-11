@@ -50,10 +50,14 @@ export default class AclStoreAccess extends BaseCommand {
         const { authorizeRoute } = meta;
         return {
           name: authorizeRoute.name,
-          slug: snakeCase(authorizeRoute.name),
-          description: authorizeRoute.description,
+          slug: snakeCase(authorizeRoute.slug),
           group: authorizeRoute.group,
           route: `${methods.join("|")} ${pattern}`,
+          description: `${authorizeRoute.name} du groupe ${
+            authorizeRoute.group
+          } accept les méthodes (${methods.join(
+            "|"
+          )}) sur Url sous la forme de ${pattern}`,
         } as { route: string; slug: string } & AccessRouteContract;
       }
     );
