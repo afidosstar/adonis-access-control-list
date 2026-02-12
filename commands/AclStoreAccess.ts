@@ -71,7 +71,7 @@ export default class AclStoreAccess extends BaseCommand {
         const { authorizeRoute } = meta;
         return {
           name: authorizeRoute.name,
-          slug: snakeCase(authorizeRoute.name),
+          slug: snakeCase(authorizeRoute.slug),
           group: authorizeRoute.group,
           route: `${methods.join("|")} ${pattern}`,
           description: `${authorizeRoute.description} du groupe ${
