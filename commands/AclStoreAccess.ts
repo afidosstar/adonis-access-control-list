@@ -1,7 +1,6 @@
-import { BaseCommand } from "@adonisjs/core/build/standalone";
+import { BaseCommand, flags } from "@adonisjs/core/build/standalone";
 import * as _ from "lodash";
 import { AccessRouteContract } from "@ioc:Adonis/Addons/Acl";
-import Permission from "@ioc:Adonis/Addons/Acl/Models/Permission";
 import { snakeCase } from "snake-case";
 
 export default class AclStoreAccess extends BaseCommand {
@@ -14,7 +13,7 @@ export default class AclStoreAccess extends BaseCommand {
    * Command description is displayed in the "help" output
    */
   public static description =
-    "Update permissions in Db, based on route with method authorize";
+    "Update permissions in Db based on route with method authorize. Use --list or --json to preview changes.";
 
   public static settings = {
     /**
@@ -31,6 +30,27 @@ export default class AclStoreAccess extends BaseCommand {
      */
     stayAlive: false,
   };
+
+  @flags.boolean({
+    description:
+      "Afficher uniquement la liste des permissions sans les sauvegarder",
+    alias: "l",
+  })
+  public declare list: boolean;
+
+  @flags.boolean({
+    description:
+      "Afficher la liste des permissions au format JSON sans les sauvegarder",
+    alias: "j",
+  })
+  public declare json: boolean;
+
+  @flags.array({
+    description:
+      "Colonnes à afficher pour le mode liste (slug, name, group, route, description)",
+    alias: "c",
+  })
+  public declare columns: string[];
 
   public async run() {
     const Router = this.application.container.use("Adonis/Core/Route");
@@ -51,10 +71,10 @@ export default class AclStoreAccess extends BaseCommand {
         const { authorizeRoute } = meta;
         return {
           name: authorizeRoute.name,
-          slug: snakeCase(authorizeRoute.slug),
+          slug: snakeCase(authorizeRoute.name),
           group: authorizeRoute.group,
           route: `${methods.join("|")} ${pattern}`,
-          description: `${authorizeRoute.name} du groupe ${
+          description: `${authorizeRoute.description} du groupe ${
             authorizeRoute.group
           } accept les méthodes (${methods.join(
             "|"
@@ -62,28 +82,87 @@ export default class AclStoreAccess extends BaseCommand {
         } as { route: string; slug: string } & AccessRouteContract;
       }
     );
-    require("fs").writeFileSync(
-      "authorizedDescriptors.json",
-      JSON.stringify(authorizedDescriptors, null, 2)
-    );
+
+    // Vérification des doublons par slug
     _.each(_.groupBy(authorizedDescriptors, "slug"), (row, slug) => {
       if (row.length > 1) {
         this.logger.error(
           ` => fail, all ${row
-            .map(({ endpoint }) => endpoint)
+            .map(({ route }) => route)
             .join(", ")} as same access slug( ${slug} )`
         );
         process.exit(1);
       }
     });
+
+    // Vérification des doublons par name
+    _.each(_.groupBy(authorizedDescriptors, "name"), (row, name) => {
+      if (row.length > 1) {
+        this.logger.error(
+          ` => fail, all ${row
+            .map(({ route }) => route)
+            .join(", ")} as same access name( ${name} )`
+        );
+        process.exit(1);
+      }
+    });
+
+    if (this.json) {
+      console.log(JSON.stringify(authorizedDescriptors, null, 2));
+      return;
+    }
+
+    if (this.list) {
+      const table = this.ui.table();
+
+      const availableColumns = {
+        slug: "Slug",
+        name: "Nom",
+        group: "Groupe",
+        route: "Route",
+        description: "Description",
+      };
+
+      let columnsToShow =
+        this.columns && this.columns.length > 0
+          ? this.columns.filter((c) =>
+              Object.keys(availableColumns).includes(c)
+            )
+          : Object.keys(availableColumns);
+
+      if (columnsToShow.length === 0) {
+        columnsToShow = Object.keys(availableColumns);
+      }
+
+      table.head(columnsToShow.map((c) => availableColumns[c]));
+
+      authorizedDescriptors.forEach((desc) => {
+        const rowData = columnsToShow.map((col) => {
+          if (col === "group" || col === "description") {
+            return desc[col] || "-";
+          }
+          return desc[col];
+        });
+        table.row(rowData);
+      });
+
+      table.render();
+      this.logger.info(
+        `\nTotal: ${authorizedDescriptors.length} permission(s) trouvée(s)`
+      );
+      return;
+    }
+
     await Database.transaction(async (trx) => {
-      await Permission.query({ client: trx })
+      await trx
+        .from("permissions")
         .whereNotIn(
           "slug",
           authorizedDescriptors.map(({ slug }) => slug)
         )
         .delete();
-      const permits = await Permission.query({ client: trx })
+      const permits = await trx
+        .table("permissions")
         .knexQuery.insert(authorizedDescriptors)
         .onConflict(["route"])
         .merge()

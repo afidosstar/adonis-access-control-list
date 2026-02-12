@@ -128,6 +128,10 @@ declare module "@ioc:Adonis/Addons/Acl" {
     name: string;
     group?: string;
   }
+  export interface PermissionRouteContract extends AccessRouteContract {
+    route: string;
+    description?: string;
+  }
 
   export interface ConfigAclContract {
     prefix?: string;
