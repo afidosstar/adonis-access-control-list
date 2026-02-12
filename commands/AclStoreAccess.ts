@@ -73,7 +73,9 @@ export default class AclStoreAccess extends BaseCommand {
           slug: authorizeRoute.slug,
           group: authorizeRoute.group,
           route: `${methods.join("|")} ${pattern}`,
-          description: `${authorizeRoute.description} du groupe ${
+          description: `${authorizeRoute.name} (${
+            authorizeRoute.slug
+          }) du groupe ${
             authorizeRoute.group
           } accept les méthodes (${methods.join(
             "|"
