@@ -1,6 +1,7 @@
 import { BaseCommand } from "@adonisjs/core/build/standalone";
 import * as _ from "lodash";
 import { AccessRouteContract } from "@ioc:Adonis/Addons/Acl";
+import Permission from "@ioc:Adonis/Addons/Acl/Models/Permission";
 import { snakeCase } from "snake-case";
 
 export default class AclStoreAccess extends BaseCommand {
@@ -61,6 +62,10 @@ export default class AclStoreAccess extends BaseCommand {
         } as { route: string; slug: string } & AccessRouteContract;
       }
     );
+    require("fs").writeFileSync(
+      "authorizedDescriptors.json",
+      JSON.stringify(authorizedDescriptors, null, 2)
+    );
     _.each(_.groupBy(authorizedDescriptors, "slug"), (row, slug) => {
       if (row.length > 1) {
         this.logger.error(
@@ -72,15 +77,13 @@ export default class AclStoreAccess extends BaseCommand {
       }
     });
     await Database.transaction(async (trx) => {
-      await trx
-        .from("permissions")
+      await Permission.query({ client: trx })
         .whereNotIn(
           "slug",
           authorizedDescriptors.map(({ slug }) => slug)
         )
         .delete();
-      const permits = await trx
-        .table("permissions")
+      const permits = await Permission.query({ client: trx })
         .knexQuery.insert(authorizedDescriptors)
         .onConflict(["route"])
         .merge()

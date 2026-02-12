@@ -11,6 +11,7 @@
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
     "forceConsistentCasingInFileNames": true,
+    "preserveSymlinks": true,
     "types": [
       "@types/node",
       "@adonisjs/core",
