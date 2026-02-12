@@ -1,7 +1,6 @@
 import { BaseCommand, flags } from "@adonisjs/core/build/standalone";
 import * as _ from "lodash";
 import { AccessRouteContract } from "@ioc:Adonis/Addons/Acl";
-import { snakeCase } from "snake-case";
 
 export default class AclStoreAccess extends BaseCommand {
   /**
@@ -71,7 +70,7 @@ export default class AclStoreAccess extends BaseCommand {
         const { authorizeRoute } = meta;
         return {
           name: authorizeRoute.name,
-          slug: snakeCase(authorizeRoute.slug),
+          slug: authorizeRoute.slug,
           group: authorizeRoute.group,
           route: `${methods.join("|")} ${pattern}`,
           description: `${authorizeRoute.description} du groupe ${
