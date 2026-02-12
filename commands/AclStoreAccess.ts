@@ -153,13 +153,6 @@ export default class AclStoreAccess extends BaseCommand {
     }
 
     await Database.transaction(async (trx) => {
-      await trx
-        .from("permissions")
-        .whereNotIn(
-          "slug",
-          authorizedDescriptors.map(({ slug }) => slug)
-        )
-        .delete();
       const permits = await trx
         .table("permissions")
         .knexQuery.insert(authorizedDescriptors)
@@ -171,6 +164,13 @@ export default class AclStoreAccess extends BaseCommand {
         .merge()
         .returning("id");
 
+      await trx
+        .from("permissions")
+        .whereNotIn(
+          "slug",
+          authorizedDescriptors.map(({ slug }) => slug)
+        )
+        .delete();
       const ids = permits.map((p) => p.id);
       await trx.from("permissions").whereNotIn("id", ids).delete();
     })
