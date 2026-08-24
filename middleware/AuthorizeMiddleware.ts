@@ -25,7 +25,10 @@ export default class AuthorizeMiddleware {
       throw new AuthNotConfiguredException();
     }
 
-    const slug = get(route, "meta.routePermission.name");
+    // `.name` est le libellé humain (2e argument de `.permission(slug, name, group)`),
+    // pas l'identifiant vérifié en base par `user.can()` — c'est `.slug` qu'il faut lire.
+    // Sinon aucun utilisateur non super_admin ne passe jamais aucune vérification.
+    const slug = get(route, "meta.routePermission.slug");
 
     // Si pas de slug ACL, on passe sans vérification
     if (!slug) {
