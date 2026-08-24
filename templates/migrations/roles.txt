@@ -19,7 +19,6 @@ export default class Roles extends BaseSchema {
       table.string("slug", 50).notNullable().unique();
       table.string("description",255);
       table.string("name", 255).notNullable().unique();
-      table.datetime("deleted_at");
 
       /**
        * Indexes for better performance

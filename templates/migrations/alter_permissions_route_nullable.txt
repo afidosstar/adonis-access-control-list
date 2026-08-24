@@ -1,0 +1,33 @@
+/*
+ *  Copyright (c) 2022.
+ *  @project adonis-acl
+ *  @author "fiacre.ayedoun@gmail.com"
+ *
+ *  For the full copyright and license information, please view the LICENSE
+ *  file that was distributed with this source code.
+ *
+ */
+import BaseSchema from "@ioc:Adonis/Lucid/Schema";
+
+/**
+ * Rend la colonne `route` optionnelle afin de pouvoir créer des permissions
+ * qui ne sont rattachées à aucune route (permissions métier).
+ *
+ * L'index unique est conservé : SQL autorise plusieurs valeurs NULL dans un
+ * index unique.
+ */
+export default class AlterPermissionsRouteNullable extends BaseSchema {
+  protected tableName = "{{ tableName }}";
+
+  public async up() {
+    this.schema.alterTable(this.tableName, (table) => {
+      table.string("route", 255).nullable().alter();
+    });
+  }
+
+  public async down() {
+    this.schema.alterTable(this.tableName, (table) => {
+      table.string("route", 255).notNullable().alter();
+    });
+  }
+}

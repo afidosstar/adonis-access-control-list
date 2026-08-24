@@ -19,9 +19,8 @@ export default class Permissions extends BaseSchema {
       table.string("name", 255).unique();
       table.string("slug", 50).notNullable().unique();
       table.string("description", 255);
-      table.string("route", 255).notNullable().unique();
+      table.string("route", 255).nullable().unique();
       table.string("group", 255);
-      table.datetime("deleted_at");
 
       /**
        * Indexes for better performance

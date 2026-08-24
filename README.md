@@ -54,6 +54,16 @@ node ace acl:setup
 node ace migration:run
 ```
 
+## Mise à jour d'un projet existant
+Si le package était déjà installé avant la version 2.1.0, générez les
+migrations d'ajustement du schéma :
+```bash
+node ace acl:upgrade
+node ace migration:run
+```
+Cette commande rend la colonne `permissions.route` optionnelle. Elle est
+idempotente : les migrations déjà présentes ne sont pas régénérées.
+
 # Configuration
 
 Allez dans `config/acl.ts` pour personnaliser votre configuration :
@@ -211,6 +221,19 @@ node ace acl:create:permission users.create "Create Users" \
   --description="Créer des utilisateurs" \
   --group="users" \
   --route="POST /users"
+```
+
+### Permission sans route
+La colonne `route` est optionnelle : une permission peut n'être rattachée à
+aucune route (permission métier vérifiée manuellement via `user.can()`).
+```bash
+node ace acl:create:permission reports.export "Exporter les rapports" \
+  --group="reports"
+```
+```ts
+if (await user.can('reports.export')) {
+  // ...
+}
 ```
 
 ### Synchroniser depuis les Routes
