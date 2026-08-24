@@ -25,7 +25,7 @@ export default class AuthorizeMiddleware {
       throw new AuthNotConfiguredException();
     }
 
-    const slug = get(route, "meta.authorizeRoute.name");
+    const slug = get(route, "meta.routePermission.name");
 
     // Si pas de slug ACL, on passe sans vérification
     if (!slug) {

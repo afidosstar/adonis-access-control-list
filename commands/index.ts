@@ -15,7 +15,7 @@ function resolve(path) {
 
 export default [
   resolve("AclSetup"),
-  resolve("AclStoreAccess"),
+  resolve("AclStorePermissions"),
   resolve("AclCreateRole"),
   resolve("AclCreatePermission"),
   resolve("AclAssignRole"),

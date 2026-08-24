@@ -215,9 +215,11 @@ node ace acl:create:permission users.create "Create Users" \
 
 ### Synchroniser depuis les Routes
 ```bash
-node ace acl:store:access
+node ace acl:store:permissions
 ```
-Cette commande scanne toutes vos routes avec `.access()` et crée/met à jour automatiquement les permissions.
+Cette commande scanne toutes vos routes avec `.permission()` et crée/met à jour automatiquement les permissions.
+
+> L'ancien nom `acl:store:access` reste disponible comme alias.
 
 ## Assigner des Permissions à un Rôle
 
@@ -259,7 +261,7 @@ node ace acl:list:permissions --group=users
 
 ```ts
 const user = await User.find(1)
-const permissions = await user.getAccesses()
+const permissions = await user.getPermissions()
 // ['users.create', 'users.update', 'users.delete', 'posts.*']
 ```
 # User Helper Methods
@@ -444,12 +446,14 @@ node ace acl:assign:permission users.create --user=1
 
 ```bash
 # Synchroniser les permissions depuis les routes définies
-node ace acl:store:access
+node ace acl:store:permissions
 ```
 
 # Protect Routes
 
-Protégez vos routes avec le middleware et la méthode `.access()` :
+Protégez vos routes avec le middleware et la méthode `.permission()` :
+
+> L'ancienne méthode `.access()` reste disponible comme alias déprécié.
 
 ```ts
 import Route from '@ioc:Adonis/Core/Route'
@@ -457,24 +461,24 @@ import Route from '@ioc:Adonis/Core/Route'
 Route.group(() => {
     // Définir les permissions pour chaque route
     Route.get('users', 'UsersController.index')
-        .access('users.list', 'Liste des utilisateurs')
+        .permission('users.list', 'Liste des utilisateurs')
 
     Route.get('users/:id', 'UsersController.show')
-        .access('users.show', 'Détail utilisateur')
+        .permission('users.show', 'Détail utilisateur')
 
     Route.post('users', 'UsersController.store')
-        .access('users.create', 'Créer un utilisateur')
+        .permission('users.create', 'Créer un utilisateur')
 
     Route.put('users/:id', 'UsersController.update')
-        .access('users.update', 'Modifier un utilisateur')
+        .permission('users.update', 'Modifier un utilisateur')
 
     Route.delete('users/:id', 'UsersController.destroy')
-        .access('users.delete', 'Supprimer un utilisateur')
+        .permission('users.delete', 'Supprimer un utilisateur')
 
 }).prefix('api/v1').middleware('auth')
 
 // Puis synchroniser
-// $ node ace acl:store:access
+// $ node ace acl:store:permissions
 ```
 
 ## Vérifications Manuelles

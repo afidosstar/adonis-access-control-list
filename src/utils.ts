@@ -39,7 +39,7 @@ function buildQuery(
     .leftJoin(`${userRole}`, `${userRole}.role_id`, "roles.id");
 }
 
-export async function getUserAccessSlug(
+export async function getUserPermissionSlugs(
   userId: number,
   trx?: TransactionClientContract
 ): Promise<Array<string>> {
@@ -82,7 +82,7 @@ function matchesWildcard(permission: string, requested: string): boolean {
   return false;
 }
 
-export async function checkAccess(
+export async function checkPermission(
   userId: number,
   slug: string,
   trx?: TransactionClientContract

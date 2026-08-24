@@ -1,12 +1,17 @@
 import { BaseCommand, flags } from "@adonisjs/core/build/standalone";
 import * as _ from "lodash";
-import { AccessRouteContract } from "@ioc:Adonis/Addons/Acl";
+import { PermissionRouteContract } from "@ioc:Adonis/Addons/Acl";
 
-export default class AclStoreAccess extends BaseCommand {
+export default class AclStorePermissions extends BaseCommand {
   /**
    * Command name is used to run the command
    */
-  public static commandName = "acl:store:access";
+  public static commandName = "acl:store:permissions";
+
+  /**
+   * Ancien nom conservé comme alias pour la rétrocompatibilité
+   */
+  public static aliases = ["acl:store:access"];
 
   /**
    * Command description is displayed in the "help" output
@@ -62,25 +67,25 @@ export default class AclStoreAccess extends BaseCommand {
     const authorizedDescriptors: ({
       route: string;
       slug: string;
-    } & AccessRouteContract)[] = _.map(
+    } & PermissionRouteContract)[] = _.map(
       _.concat(..._.values(Router.toJSON())).filter(
-        ({ meta }) => meta.authorizeRoute
+        ({ meta }) => meta.routePermission
       ),
       ({ methods, pattern, meta }: any) => {
-        const { authorizeRoute } = meta;
+        const { routePermission } = meta;
         return {
-          name: authorizeRoute.name,
-          slug: authorizeRoute.slug,
-          group: authorizeRoute.group,
+          name: routePermission.name,
+          slug: routePermission.slug,
+          group: routePermission.group,
           route: `${methods.join("|")} ${pattern}`,
-          description: `${authorizeRoute.name} (${
-            authorizeRoute.slug
+          description: `${routePermission.name} (${
+            routePermission.slug
           }) du groupe ${
-            authorizeRoute.group
+            routePermission.group
           } accept les méthodes (${methods.join(
             "|"
           )}) sur Url sous la forme de ${pattern}`,
-        } as { route: string; slug: string } & AccessRouteContract;
+        } as { route: string; slug: string } & PermissionRouteContract;
       }
     );
 

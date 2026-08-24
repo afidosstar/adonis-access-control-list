@@ -10,12 +10,20 @@
  */
 
 declare module "@ioc:Adonis/Core/Route" {
-  import { AccessRouteContract } from "@ioc:Adonis/Addons/Acl";
+  import { PermissionRouteContract } from "@ioc:Adonis/Addons/Acl";
   export interface RouterContract {
-    authorizeRoute: AccessRouteContract;
+    routePermission: PermissionRouteContract;
+    /**
+     * @deprecated Utiliser `routePermission` à la place
+     */
+    authorizeRoute: PermissionRouteContract;
   }
 
   interface RouteACLContract {
+    permission(slug: string, name: string, group?: string): this;
+    /**
+     * @deprecated Utiliser `permission()` à la place
+     */
     access(slug: string, name: string, group?: string): this;
     profile(name: string): this;
   }

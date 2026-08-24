@@ -17,7 +17,10 @@ import {
   RouteResourceContract,
 } from "@ioc:Adonis/Core/Route";
 import { ApplicationContract } from "@ioc:Adonis/Core/Application";
-import { AccessRouteContract, ConfigAclContract } from "@ioc:Adonis/Addons/Acl";
+import {
+  PermissionRouteContract,
+  ConfigAclContract,
+} from "@ioc:Adonis/Addons/Acl";
 import { join } from "path";
 import { LucidModel } from "@ioc:Adonis/Lucid/Orm";
 import authUserBuilder from "../src/Decorator/AuthUser";
@@ -77,25 +80,36 @@ export default class AccessControlProvider {
 
     Route.Route.macro("toJSON", this.toJSON);
 
-    Route.Route.macro("access", this.accessCallbackFn);
+    Route.Route.macro("permission", this.permissionCallbackFn);
+    Route.RouteResource.macro("permission", this.permissionResourceCallbackFn);
 
-    Route.RouteResource.macro("access", this.accessResourceCallbackFn);
+    /**
+     * Anciens noms conservés comme alias pour la rétrocompatibilité
+     */
+    Route.Route.macro("access", this.permissionCallbackFn);
+    Route.RouteResource.macro("access", this.permissionResourceCallbackFn);
 
     this.addWebPermission(configACL);
   }
 
-  private accessCallbackFn(this: RouteContract, slug, name, group) {
-    (this as any).authorizeRoute = {
+  private permissionCallbackFn(this: RouteContract, slug, name, group) {
+    const routePermission = {
       slug: slug,
       name: name || slug,
       group: group,
     };
 
-    //this.middleware([`can:${authorizeRoute.name}`]);
+    (this as any).routePermission = routePermission;
+    /**
+     * Ancienne propriété conservée comme alias pour la rétrocompatibilité
+     */
+    (this as any).authorizeRoute = routePermission;
+
+    //this.middleware([`can:${routePermission.name}`]);
     return this;
   }
 
-  private accessResourceCallbackFn(
+  private permissionResourceCallbackFn(
     this: RouteResourceContract,
     slug,
     name,
@@ -118,14 +132,18 @@ export default class AccessControlProvider {
       const routeTag = route.name.replace(/.*\.([a-z])/, "$1");
       const [label] = map.find(([_, tags]) => tags.includes(routeTag))!;
 
-      const authorizeRoute: AccessRouteContract = {
+      const routePermission: PermissionRouteContract = {
         slug: `${replaceList[routeTag] || routeTag}_${slug}`,
         name: `${label} - ${name}`,
         group: group,
       };
 
-      (route as any).authorizeRoute = authorizeRoute;
-      //middlewareMap[route.name] = [`authorize:${authorizeRoute.slug}`];
+      (route as any).routePermission = routePermission;
+      /**
+       * Ancienne propriété conservée comme alias pour la rétrocompatibilité
+       */
+      (route as any).authorizeRoute = routePermission;
+      //middlewareMap[route.name] = [`authorize:${routePermission.slug}`];
     });
     //this.middleware(middlewareMap);
     return this;
@@ -143,7 +161,12 @@ export default class AccessControlProvider {
       meta: {
         ...that.meta,
         namespace: that.routeNamespace,
-        authorizeRoute: that.authorizeRoute,
+        routePermission: that.routePermission,
+        /**
+         * Ancienne clé conservée comme alias pour la rétrocompatibilité
+         * @deprecated Utiliser `meta.routePermission` à la place
+         */
+        authorizeRoute: that.routePermission,
       },
       name: that.name,
       handler: that.handler,

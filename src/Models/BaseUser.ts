@@ -17,7 +17,7 @@ import {
 } from "@ioc:Adonis/Lucid/Orm";
 import { NormalizeConstructor } from "@poppinss/utils/build/src/Helpers";
 import Config from "@ioc:Adonis/Core/Config";
-import { checkAccess, getUserPermissions, getUserRoles } from "../utils";
+import { checkPermission, getUserPermissions, getUserRoles } from "../utils";
 import Permission from "./Permission";
 import Role from "./Role";
 const { permissionUser, userRole } = Config.get("acl.joinTables");
@@ -56,7 +56,7 @@ export function BaseUser<T extends NormalizeConstructor<LucidModel>>(
      * @param slug - Le slug de la permission (ex: 'users.create')
      */
     public async can(slug: string): Promise<boolean> {
-      return checkAccess(this.$primaryKeyValue as number, slug, this.$trx);
+      return checkPermission(this.$primaryKeyValue as number, slug, this.$trx);
     }
 
     /**

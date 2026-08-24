@@ -123,12 +123,13 @@ declare module "@ioc:Adonis/Addons/Acl" {
   import { PermissionModel } from "@ioc:Adonis/Addons/Acl/Models/Permission";
   import { RoleModel } from "@ioc:Adonis/Addons/Acl/Models/Role";
 
-  export interface AccessRouteContract {
+  export interface PermissionRouteContract {
     slug: string;
     name: string;
     group?: string;
   }
-  export interface PermissionRouteContract extends AccessRouteContract {
+  export interface PermissionDefinitionContract
+    extends PermissionRouteContract {
     route: string;
     description?: string;
   }
@@ -151,7 +152,6 @@ declare module "@ioc:Adonis/Addons/Acl" {
     roles: ManyToMany<RoleModel>;
     permissions: ManyToMany<PermissionModel>;
 
-    getAccesses(): Promise<string[]>;
     can(slug: string): Promise<boolean>;
     getRoles(): Promise<string[]>;
     getPermissions(): Promise<string[]>;
