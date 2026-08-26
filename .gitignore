@@ -11,3 +11,4 @@ tests/__app
 build
 dist
 shrinkwrap.yaml
+.npmrc
